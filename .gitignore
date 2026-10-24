@@ -1,0 +1,15 @@
+node_modules/
+dist/
+.turbo/
+coverage/
+*.log
+.env
+.env.*
+!.env.example
+.DS_Store
+playwright-report/
+test-results/
+*.tsbuildinfo
+
+# Local artifact storage (apps/server ARTIFACT_DIR)
+.data/
