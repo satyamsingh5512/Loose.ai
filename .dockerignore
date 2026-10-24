@@ -1,0 +1,53 @@
+# loose.ai .dockerignore
+# Keep the build context small; exclude dev artefacts and secrets.
+
+# Dependencies (installed fresh inside the build)
+node_modules
+**/node_modules
+
+# Turbo cache
+.turbo
+
+# Dev environment files
+apps/server/.env
+apps/server/.env.*
+!apps/server/.env.example
+.env
+.env.*
+
+# Test output and coverage
+coverage
+.vitest
+
+# Git metadata
+.git
+.gitignore
+
+# Docs and ops (not needed in the image)
+docs
+ops
+# Note: status/ is NOT excluded because web.Dockerfile copies it into the SPA build.
+# The docker build context includes status/ so the web image can embed the status page.
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# TypeScript build info
+*.tsbuildinfo
+
+# Prisma shadow db / migration lock
+apps/server/prisma/__shadow*
+
+# BRIEF and kiro work files
+.kiro
