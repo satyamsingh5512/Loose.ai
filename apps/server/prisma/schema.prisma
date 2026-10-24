@@ -1,0 +1,1304 @@
+// loose.ai database schema (spec §9).
+// All models carry createdAt/updatedAt. Secret material is stored only as
+// envelope-encrypted bytes (see src/lib/crypto.ts).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  OWNER
+  ADMIN
+  MEMBER
+  VIEWER
+}
+
+enum Mode {
+  SIMPLE
+  PRO
+}
+
+enum TemplateStatus {
+  PENDING
+  BUILDING
+  READY
+  FAILED
+}
+
+enum SessionStatus {
+  QUEUED
+  STARTING
+  RUNNING
+  PAUSED
+  STOPPING
+  COMPLETED
+  ERRORED
+  TIMED_OUT
+}
+
+enum Outcome {
+  PR_CREATED
+  COMMITTED_TO_MAIN
+  DISCARDED
+}
+
+enum MsgRole {
+  USER
+  ASSISTANT
+  SYSTEM
+}
+
+enum ExtScope {
+  BUILTIN
+  ORG
+  PROJECT
+  USER
+}
+
+enum McpTransport {
+  STDIO
+  HTTP
+  SSE
+}
+
+enum KeyStatus {
+  ACTIVE
+  INVALID
+  REVOKED
+  EXPIRED
+}
+
+// ---- Phase 9 (platform) ----
+
+enum RunStatus {
+  QUEUED
+  PROVISIONING
+  RUNNING
+  WAITING_APPROVAL
+  CREATING_PR
+  SUCCEEDED
+  FAILED
+  CANCELLED
+}
+
+enum RunSource {
+  API
+  CLI
+  GITHUB_ACTION
+  GITHUB_ISSUE
+  GITHUB_COMMENT
+  SLACK
+  LINEAR
+  JIRA
+  SCHEDULE
+}
+
+enum TriggerKind {
+  GITHUB_ISSUE_LABEL
+  GITHUB_PR_COMMENT
+  SLACK_COMMAND
+  LINEAR
+  JIRA
+  SCHEDULE
+}
+
+enum ShareRole {
+  VIEWER
+  CO_EDITOR
+}
+
+enum WebhookDeliveryStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+}
+
+// ---- Phase 10 (hardening & GA) ----
+
+enum SsoProtocol {
+  OIDC
+  SAML
+}
+
+enum DataExportKind {
+  USER
+  ORG
+}
+
+enum DataExportStatus {
+  PENDING
+  RUNNING
+  SUCCEEDED
+  FAILED
+  EXPIRED
+}
+
+enum DeletionKind {
+  USER
+  ORG
+}
+
+enum DeletionStatus {
+  PENDING
+  CANCELLED
+  COMPLETED
+  FAILED
+}
+
+// ---------------------------------------------------------------- users & auth
+
+model User {
+  id                   String    @id @default(cuid())
+  email                String    @unique
+  name                 String?
+  avatarUrl            String?
+  preferredMode        Mode      @default(SIMPLE)
+  /// Personal memory loaded into every session of this user (spec §8.10).
+  memory               String?
+  memoryUpdatedAt      DateTime?
+  githubId             String?   @unique
+  googleId             String?   @unique
+  /// Active TOTP secret (envelope-encrypted, purpose `totp-secret`); null = 2FA off.
+  totpSecretEnc        Bytes?
+  /// Secret of an enrollment that has not been activated yet.
+  totpPendingSecretEnc Bytes?
+  totpEnabledAt        DateTime?
+  /// Last accepted TOTP time step (replay protection).
+  totpLastStep         Int?
+  /// Account deletion requested (GDPR/DPDP); executed by the deletion sweep.
+  deletionScheduledAt  DateTime?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  oauthAccounts  OAuthAccount[]
+  authSessions   AuthSession[]
+  apiKeys        ApiKey[]
+  apiTokens      ApiToken[]
+  memberships    OrgMember[]
+  invitesSent    OrgInvite[]     @relation("InvitedBy")
+  sessions       Session[]
+  usageEvents    UsageEvent[]
+  auditLogs      AuditLog[]      @relation("AuditActor")
+  toolApprovals  ToolApproval[]  @relation("ToolApprovalDecidedBy")
+  skillVersions  SkillVersion[]
+  skills         Skill[]
+  slashCommands  SlashCommand[]
+  subagents      Subagent[]
+  mcpServers     McpServer[]
+  plugins        Plugin[]
+  pluginVersions PluginVersion[]
+  pluginInstalls PluginInstall[]
+
+  runs                Run[]
+  triggersRunAs       Trigger[]             @relation("TriggerRunAs")
+  triggersCreated     Trigger[]             @relation("TriggerCreatedBy")
+  webhooksCreated     Webhook[]             @relation("WebhookCreatedBy")
+  collaborations      SessionCollaborator[] @relation("SessionCollaboratorUser")
+  collaboratorInvites SessionCollaborator[] @relation("SessionCollaboratorInvitedBy")
+  controlledSessions  Session[]             @relation("SessionController")
+
+  ssoIdentities    SsoIdentity[]
+  scimIdentities   ScimIdentity[]
+  scimGroups       ScimGroupMember[]
+  recoveryCodes    TotpRecoveryCode[]
+  dataExports      DataExport[]       @relation("DataExportRequestedBy")
+  deletionRequests DeletionRequest[]  @relation("DeletionRequestUser")
+}
+
+model OAuthAccount {
+  id                String    @id @default(cuid())
+  userId            String
+  provider          String // google | github
+  providerAccountId String
+  accessTokenEnc    Bytes // envelope-encrypted (packed blob)
+  refreshTokenEnc   Bytes?
+  scopes            String[]
+  expiresAt         DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@unique([userId, provider])
+}
+
+/// Lucia-style session. `id` = sha256(hex) of the token held in the cookie.
+model AuthSession {
+  id              String    @id
+  userId          String
+  expiresAt       DateTime
+  ip              String?
+  userAgent       String?
+  /// Set once the session passed the 2FA challenge (users with TOTP enabled).
+  mfaVerifiedAt   DateTime?
+  /// Set when the session was established through this org's SSO connection.
+  ssoOrgId        String?
+  ssoConnectionId String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model ApiKey {
+  id              String    @id @default(cuid())
+  userId          String
+  orgId           String? // set for shared org keys
+  provider        String    @default("anthropic")
+  label           String?
+  keyEnc          Bytes // AES-256-GCM ciphertext || tag
+  dataKeyEnc      Bytes // KMS-wrapped data key
+  iv              Bytes
+  last4           String
+  status          KeyStatus @default(ACTIVE)
+  lastValidatedAt DateTime?
+  monthlyLimitUsd Decimal?  @db.Decimal(12, 4)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  user User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  org  Organization? @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([orgId])
+}
+
+// ---------------------------------------------------------------- organizations
+
+model Organization {
+  id                   String    @id @default(cuid())
+  name                 String
+  slug                 String    @unique
+  githubInstallationId String?
+  /// Org-level guardrail defaults, locked modes, retention (orgPolicySchema).
+  policy               Json      @default("{}")
+  /// Org-wide memory loaded before every project's LOOSE.md (spec §8.10).
+  memory               String?
+  memoryUpdatedAt      DateTime?
+  /// Per-org IP allowlist (spec §8.20): CIDRs checked on cookie, token and WS access.
+  ipAllowlistEnabled   Boolean   @default(false)
+  ipAllowlist          String[]  @default([])
+  /// Enforce TOTP 2FA for OWNER / ADMIN members.
+  requireAdmin2fa      Boolean   @default(false)
+  /// Per-org feature flag overrides {flag: boolean}.
+  featureFlags         Json      @default("{}")
+  /// Org deletion requested; writes are blocked (LSE-ORG-012) until cancelled or executed.
+  deletionScheduledAt  DateTime?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  members       OrgMember[]
+  invites       OrgInvite[]
+  projects      Project[]
+  apiKeys       ApiKey[]
+  apiTokens     ApiToken[]
+  webhooks      Webhook[]
+  usageEvents   UsageEvent[]
+  auditLogs     AuditLog[]
+  skills        Skill[]
+  slashCommands SlashCommand[]
+  subagents     Subagent[]
+  hooks         Hook[]
+  plugins       Plugin[]
+  mcpServers    McpServer[]
+  runs          Run[]
+  triggers      Trigger[]
+
+  ssoConnection    SsoConnection?
+  domains          OrgDomain[]
+  scimTokens       ScimToken[]
+  scimIdentities   ScimIdentity[]
+  scimGroups       ScimGroup[]
+  dataExports      DataExport[]
+  deletionRequests DeletionRequest[]
+  policyPacks      PolicyPack[]
+}
+
+model OrgMember {
+  id         String   @id @default(cuid())
+  userId     String
+  orgId      String
+  role       Role
+  lockedMode Mode?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  org  Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, orgId])
+  @@index([orgId, role])
+}
+
+model OrgInvite {
+  id          String    @id @default(cuid())
+  orgId       String
+  email       String? // null = shareable multi-use link invite
+  /// sha256(hex) of the raw invite token; the raw token is returned once.
+  token       String    @unique
+  role        Role
+  expiresAt   DateTime
+  acceptedAt  DateTime?
+  revokedAt   DateTime?
+  invitedById String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  org       Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  invitedBy User         @relation("InvitedBy", fields: [invitedById], references: [id], onDelete: Cascade)
+
+  @@index([orgId, createdAt])
+}
+
+// ---------------------------------------------------------------- projects
+
+model Project {
+  id                      String         @id @default(cuid())
+  orgId                   String
+  name                    String
+  githubRepoFullName      String
+  githubRepoUrl           String
+  defaultBranch           String
+  envVarsEnc              Bytes // envelope-encrypted JSON (packed blob)
+  /// Non-secret env var metadata [{name, secret}] so lists never need decryption.
+  envVarMeta              Json           @default("[]")
+  contextInstructions     String         @default("")
+  looseMd                 String? // project memory
+  componentLabels         Json? // path glob -> human label
+  /// OFF | AUTO | ALWAYS (spec §8.4).
+  planMode                String         @default("AUTO")
+  /// prefer_loose | prefer_repo | ignore (CLAUDE.md / AGENTS.md handling).
+  repoMemory              String         @default("prefer_loose")
+  /// Per-project extension toggles {skills|mcpServers|subagents: {name: bool}}.
+  extensionOverrides      Json           @default("{}")
+  /// Context usage (%) at which the conversation is auto-compacted (spec §8.11).
+  autoCompactPercent      Int            @default(80)
+  /// Viewports captured for before/after screenshots (spec §8.12).
+  screenshotViewports     String[]       @default(["desktop"])
+  /// Policy packs merged into the guardrails [{packId, slug, name, version, appliedAt, appliedById}].
+  appliedPolicyPacks      Json           @default("[]")
+  startupCommands         String[]
+  requiredServices        String[]
+  portMap                 Json           @default("[]") // [{name, port, public, envVar}]
+  healthCheck             Json?
+  allowedFilePatterns     String[]
+  deniedFilePatterns      String[]
+  commandPolicy           Json           @default("{}") // allow/deny lists
+  approvalGates           Json           @default("{}") // dependencies, migrations, deletes
+  networkAllowlist        String[]
+  defaultModel            String?
+  maxSessionDurationMin   Int            @default(60)
+  maxBudgetUsd            Decimal        @default(5) @db.Decimal(12, 4)
+  e2bTemplateId           String?
+  templateVersion         Int            @default(0)
+  templateStatus          TemplateStatus @default(PENDING)
+  templateError           String?
+  /// Sanitized build failure {code, message, logTail[]} (no secrets).
+  templateErrorDetail     Json?
+  /// Id of the build currently/last running (stale build jobs are ignored).
+  templateBuildId         String?
+  templateBuildStartedAt  DateTime?
+  templateBuildFinishedAt DateTime?
+  /// Blue/green: the template that was active before the last successful build.
+  previousTemplateId      String?
+  /// Hash of the build inputs (services, startup commands) for outdated detection.
+  templateSpecHash        String?
+  smokeTestStatus         String? // PASSED | FAILED | RUNNING
+  smokeTestFailedStep     String?
+  smokeTestAt             DateTime?
+  createdAt               DateTime       @default(now())
+  updatedAt               DateTime       @updatedAt
+
+  org            Organization    @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  sessions       Session[]
+  skills         Skill[]
+  slashCommands  SlashCommand[]
+  subagents      Subagent[]
+  hooks          Hook[]
+  mcpServers     McpServer[]
+  pluginInstalls PluginInstall[]
+  runs           Run[]
+  triggers       Trigger[]
+
+  @@index([orgId, createdAt])
+  @@index([orgId, templateStatus])
+}
+
+// ---------------------------------------------------------------- sessions
+
+model Session {
+  id                     String        @id @default(cuid())
+  projectId              String
+  userId                 String
+  mode                   Mode
+  model                  String
+  branchName             String
+  status                 SessionStatus @default(QUEUED)
+  sandboxId              String?
+  previewUrl             String?
+  agentSessionId         String? // SDK session id for resume
+  parentSessionId        String? // forks
+  totalTokensIn          BigInt        @default(0)
+  totalTokensOut         BigInt        @default(0)
+  cacheReadTokens        BigInt        @default(0)
+  totalCostUsd           Decimal       @default(0) @db.Decimal(12, 4)
+  outcome                Outcome?
+  prUrl                  String?
+  /// GitHub PR number (set on create-pr; matched by the pull_request webhook).
+  prNumber               Int?
+  /// open | merged | closed (updated by the pull_request webhook).
+  prState                String?
+  prCreatedAt            DateTime?
+  prMergedAt             DateTime?
+  commitSha              String?
+  errorCode              String?
+  /// Session budget in USD (project maxBudgetUsd at start).
+  budgetUsd              Decimal?      @db.Decimal(12, 4)
+  /// Highest event seq published on the session event bus.
+  lastEventSeq           Int           @default(0)
+  runnerPid              Int?
+  /// `refs/loose/wip/<id>` once work in progress was pushed (pause/timeout/error).
+  wipRef                 String?
+  /// Set when the agent became idle (null while a turn is running).
+  idleSince              DateTime?
+  /// Session notes (`#` quick-add), loaded last into the agent's context.
+  notes                  String        @default("")
+  /// After a conversation rewind: resume the SDK session at this anchor until the next turn completes.
+  resumeSessionAt        String?
+  /// Branch the session was cloned from and its PR targets (null = project default branch).
+  baseBranch             String?
+  /// Fork source checkpoint (spec §8.14); parentSessionId holds the source session.
+  forkedFromCheckpointId String?
+  /// Shared sessions (spec §8.18): the participant who took over control (null = owner drives).
+  controllerId           String?
+  controlTakenAt         DateTime?
+  startedAt              DateTime?
+  endedAt                DateTime?
+  createdAt              DateTime      @default(now())
+  updatedAt              DateTime      @updatedAt
+
+  project       Project               @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user          User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parent        Session?              @relation("SessionFork", fields: [parentSessionId], references: [id], onDelete: SetNull)
+  forks         Session[]             @relation("SessionFork")
+  controller    User?                 @relation("SessionController", fields: [controllerId], references: [id], onDelete: SetNull)
+  messages      ChatMessage[]
+  checkpoints   Checkpoint[]
+  artifacts     Artifact[]
+  toolApprovals ToolApproval[]
+  usageEvents   UsageEvent[]
+  collaborators SessionCollaborator[]
+  run           Run?
+
+  @@index([projectId, status])
+  @@index([userId, createdAt])
+  @@index([status, updatedAt])
+  @@index([endedAt])
+}
+
+model ChatMessage {
+  id              String    @id @default(cuid())
+  sessionId       String
+  role            MsgRole
+  content         String // filtered, user-facing
+  rawContent      Json? // original agent event(s)
+  attachments     Json? // images/files
+  metadata        Json? // filesChanged, toolsUsed, risk, hasErrors
+  checkpointId    String?
+  /// Client-supplied id for optimistic send / dedupe.
+  clientMessageId String?
+  /// Removed from the conversation by a rewind (kept for audit, hidden everywhere else).
+  rewoundAt       DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  session     Session      @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  checkpoints Checkpoint[]
+
+  @@unique([sessionId, clientMessageId])
+  @@index([sessionId, createdAt])
+  @@index([createdAt])
+}
+
+model Checkpoint {
+  id                 String    @id @default(cuid())
+  sessionId          String
+  messageId          String
+  /// Sandbox-local ref (`refs/loose/checkpoints/<id>`) holding the working tree before the turn.
+  gitRef             String
+  label              String?
+  /// 1-based number of the turn that starts after this checkpoint.
+  turn               Int       @default(1)
+  /// Agent conversation anchor before the turn (null = start of the conversation).
+  conversationAnchor String?
+  /// Agent SDK session the anchor belongs to.
+  agentSessionId     String?
+  /// False when the code snapshot could not be taken.
+  hasCode            Boolean   @default(true)
+  /// Removed by a later rewind.
+  rewoundAt          DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  session Session     @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  message ChatMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId, createdAt])
+}
+
+model Artifact {
+  id          String   @id @default(cuid())
+  sessionId   String
+  kind        String // screenshot, log, diff
+  url         String
+  /// Key in ObjectStorage (never exposed; content served via the auth-checked API).
+  storageKey  String   @default("")
+  contentType String   @default("application/octet-stream")
+  bytes       Int      @default(0)
+  meta        Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  session Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId, createdAt])
+  @@index([createdAt])
+}
+
+// ---------------------------------------------------------------- extensions
+
+model Skill {
+  id          String   @id @default(cuid())
+  scope       ExtScope
+  orgId       String?
+  projectId   String?
+  userId      String?
+  name        String
+  description String
+  bundleUrl   String   @default("")
+  version     Int
+  enabled     Boolean  @default(true)
+  /// Simple-mode quick action label (`quick-action` frontmatter).
+  quickAction String?
+  /// Current version's files [{path, content}].
+  files       Json     @default("[]")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  org      Organization?  @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  project  Project?       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user     User?          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  versions SkillVersion[]
+
+  @@unique([scope, orgId, projectId, userId, name])
+  @@index([orgId])
+}
+
+/// Immutable version history of a skill (spec §8.6 "version history").
+model SkillVersion {
+  id          String   @id @default(cuid())
+  skillId     String
+  version     Int
+  description String
+  files       Json
+  bytes       Int      @default(0)
+  createdById String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  skill     Skill @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  createdBy User? @relation(fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@unique([skillId, version])
+}
+
+model SlashCommand {
+  id        String   @id @default(cuid())
+  scope     ExtScope
+  orgId     String?
+  projectId String?
+  userId    String?
+  name      String
+  body      String
+  meta      Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  org     Organization? @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  project Project?      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user    User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([orgId])
+}
+
+model Subagent {
+  id         String   @id @default(cuid())
+  scope      ExtScope
+  orgId      String?
+  projectId  String?
+  userId     String?
+  name       String
+  /// Markdown with frontmatter (name, description, tools, model, permissionMode).
+  definition String
+  /// Parsed frontmatter {description, tools[], model, permissionMode} + plugin source.
+  meta       Json?
+  enabled    Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  org     Organization? @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  project Project?      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user    User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([scope, orgId, projectId, userId, name])
+  @@index([orgId])
+}
+
+model Hook {
+  id           String    @id @default(cuid())
+  scope        ExtScope
+  orgId        String?
+  projectId    String?
+  /// Admin-facing name shown in the Extensions page and the audit log.
+  name         String    @default("")
+  event        String
+  matcher      String?
+  /// {type: command|http|builtin, …} — never holds secrets (see secretEnc).
+  handler      Json
+  /// open = allow when the hook fails, closed = deny (default for blocking events).
+  failMode     String    @default("closed")
+  timeoutSec   Int       @default(10)
+  /// Id of the HOOK_RECIPES preset this hook was created from.
+  recipe       String?
+  /// Envelope-encrypted handler secret (http HMAC secret / Slack webhook URL).
+  secretEnc    Bytes?
+  enabled      Boolean   @default(true)
+  /// Last decision for the hook editor ("allow" | "deny" | "ask" | "modify").
+  lastDecision String?
+  lastError    String?
+  lastRunAt    DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  org     Organization? @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  project Project?      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([orgId])
+  @@index([orgId, event, enabled])
+  @@index([projectId, event, enabled])
+}
+
+model Plugin {
+  id          String   @id @default(cuid())
+  orgId       String
+  name        String
+  /// Latest published version (semver).
+  version     String
+  /// Manifest of the latest version (pluginManifestSchema).
+  manifest    Json
+  bundleUrl   String   @default("")
+  createdById String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  org       Organization    @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  createdBy User?           @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  versions  PluginVersion[]
+  installs  PluginInstall[]
+
+  @@unique([orgId, name])
+  @@index([orgId])
+}
+
+/// Immutable version history of a plugin (spec §8.16 update / rollback).
+model PluginVersion {
+  id          String   @id @default(cuid())
+  pluginId    String
+  version     String
+  manifest    Json
+  createdById String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  plugin    Plugin @relation(fields: [pluginId], references: [id], onDelete: Cascade)
+  createdBy User?  @relation(fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@unique([pluginId, version])
+}
+
+/// A plugin installed in one project at a specific version.
+model PluginInstall {
+  id             String   @id @default(cuid())
+  pluginId       String
+  projectId      String
+  version        String
+  enabled        Boolean  @default(true)
+  /// Envelope-encrypted MCP credentials {server: {key: value}} filled in on install.
+  credentialsEnc Bytes?
+  /// Credential keys per server (so lists never need decryption).
+  credentialMeta Json     @default("{}")
+  /// Ids of the resources this install created (skills, commands, subagents, hooks, mcpServers).
+  resources      Json     @default("{}")
+  installedById  String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  plugin      Plugin  @relation(fields: [pluginId], references: [id], onDelete: Cascade)
+  project     Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  installedBy User?   @relation(fields: [installedById], references: [id], onDelete: SetNull)
+
+  @@unique([pluginId, projectId])
+  @@index([projectId])
+}
+
+model McpServer {
+  id             String       @id @default(cuid())
+  scope          ExtScope
+  orgId          String?
+  projectId      String?
+  userId         String?
+  name           String
+  transport      McpTransport
+  command        String?
+  args           String[]
+  url            String?
+  credentialsEnc Bytes?
+  toolPolicy     Json // allow/deny/approval per tool
+  enabled        Boolean      @default(true)
+  /// Curated catalog entry this server was created from.
+  catalogId      String?
+  /// Tool names discovered by the last connection test / session.
+  lastTools      Json?
+  lastStatus     String?
+  lastError      String?
+  lastCheckedAt  DateTime?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  org     Organization? @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  project Project?      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user    User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([orgId])
+}
+
+// ---------------------------------------------------------------- platform
+
+model ToolApproval {
+  id              String    @id @default(cuid())
+  sessionId       String
+  tool            String
+  input           Json
+  status          String
+  /// Approval gate that triggered it (dependencies | migrations | deletes).
+  gate            String?
+  /// Mode-appropriate one-line description.
+  summary         String?
+  /// Id the runner used in `approval_needed` (echoed in `approval_response`).
+  runnerRequestId String?
+  /// tool | plan (plan-mode proposal: input = {plan}).
+  kind            String    @default("tool")
+  /// Plan proposals: the ASSISTANT chat message holding the plan.
+  messageId       String?
+  requiresAdmin   Boolean   @default(false)
+  decidedById     String?
+  reason          String?
+  expiresAt       DateTime?
+  decidedAt       DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  session   Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  decidedBy User?   @relation("ToolApprovalDecidedBy", fields: [decidedById], references: [id], onDelete: SetNull)
+
+  @@index([sessionId, createdAt])
+  @@index([status, expiresAt])
+}
+
+model ApiToken {
+  id         String    @id @default(cuid())
+  orgId      String
+  userId     String
+  name       String
+  /// sha256(hex) of the raw `loose_pat_…` token.
+  hash       String    @unique
+  scopes     String[]
+  lastUsedAt DateTime?
+  expiresAt  DateTime?
+  /// P10-SEC-002: SSO connection of the minting session when it was an SSO session of this org.
+  ssoConnectionId String?
+  /// P10-SEC-002: when the minting session passed the 2FA challenge (null = minted without MFA).
+  mfaVerifiedAt   DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  org  Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  user User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  runs Run[]
+
+  @@index([userId])
+}
+
+/// Outbound webhook (spec §8.15): HMAC-signed POSTs for platform events.
+model Webhook {
+  id             String    @id @default(cuid())
+  orgId          String
+  name           String    @default("")
+  url            String
+  /// Envelope-encrypted signing secret (`whsec_…`), shown once on create / rotate.
+  secretEnc      Bytes
+  events         String[]
+  active         Boolean   @default(true)
+  createdById    String?
+  /// Consecutive failed deliveries (reset on success); too many → active=false.
+  failureCount   Int       @default(0)
+  lastDeliveryAt DateTime?
+  /// succeeded | failed
+  lastStatus     String?
+  disabledAt     DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  org        Organization      @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  createdBy  User?             @relation("WebhookCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  deliveries WebhookDelivery[]
+
+  @@index([orgId])
+}
+
+/// One event delivered (with retries) to one webhook.
+model WebhookDelivery {
+  id              String                @id @default(cuid())
+  webhookId       String
+  orgId           String
+  /// Platform event id (`evt_…`); unique per webhook (idempotent fan-out).
+  eventId         String
+  event           String
+  payload         Json
+  status          WebhookDeliveryStatus @default(PENDING)
+  attempts        Int                   @default(0)
+  nextAttemptAt   DateTime?
+  responseStatus  Int?
+  /// First bytes of the response body (scrubbed).
+  responseSnippet String?
+  error           String?
+  durationMs      Int?
+  deliveredAt     DateTime?
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
+
+  webhook Webhook @relation(fields: [webhookId], references: [id], onDelete: Cascade)
+
+  @@unique([webhookId, eventId])
+  @@index([webhookId, createdAt])
+  @@index([status, nextAttemptAt])
+}
+
+/// Headless run (spec §10.6): prompt → session → optional PR.
+model Run {
+  id           String    @id @default(cuid())
+  orgId        String
+  projectId    String
+  /// Identity the run executes as (BYOK key, GitHub access, budgets).
+  userId       String
+  sessionId    String?   @unique
+  apiTokenId   String?
+  triggerId    String?
+  source       RunSource @default(API)
+  status       RunStatus @default(QUEUED)
+  prompt       String
+  /// runOptionsSchema output {createPr, model, mode, branch, prTitle, draft, prNotes}.
+  options      Json      @default("{}")
+  /// Client-supplied string pairs (e.g. CI run URL).
+  metadata     Json      @default("{}")
+  /// Trigger context (repo + issue number, Slack response URL, …).
+  externalRef  Json?
+  /// Final assistant message of the run.
+  summary      String?
+  filesChanged String[]  @default([])
+  prUrl        String?
+  prNumber     Int?
+  errorCode    String?
+  costUsd      Decimal   @default(0) @db.Decimal(12, 4)
+  startedAt    DateTime?
+  endedAt      DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  org      Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  project  Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user     User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  session  Session?     @relation(fields: [sessionId], references: [id], onDelete: SetNull)
+  apiToken ApiToken?    @relation(fields: [apiTokenId], references: [id], onDelete: SetNull)
+  trigger  Trigger?     @relation(fields: [triggerId], references: [id], onDelete: SetNull)
+
+  @@index([orgId, createdAt])
+  @@index([userId, createdAt])
+  @@index([status, updatedAt])
+  @@index([triggerId, createdAt])
+}
+
+/// Automation trigger (spec §8.15): GitHub label / PR comment, Slack, Linear, Jira, schedule.
+model Trigger {
+  id             String      @id @default(cuid())
+  orgId          String
+  projectId      String
+  kind           TriggerKind
+  name           String
+  enabled        Boolean     @default(true)
+  /// Per-kind config (triggerConfigSchemas).
+  config         Json        @default("{}")
+  /// Prompt with {{placeholders}}; empty = the kind's default prompt.
+  promptTemplate String      @default("")
+  runAsUserId    String
+  createPr       Boolean     @default(true)
+  mode           Mode        @default(PRO)
+  model          String?
+  /// SCHEDULE: next fire time.
+  nextRunAt      DateTime?
+  lastFiredAt    DateTime?
+  lastRunId      String?
+  lastError      String?
+  createdById    String?
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  org       Organization  @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  project   Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  runAs     User          @relation("TriggerRunAs", fields: [runAsUserId], references: [id], onDelete: Cascade)
+  createdBy User?         @relation("TriggerCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  runs      Run[]
+  fires     TriggerFire[]
+
+  @@index([orgId])
+  @@index([projectId])
+  @@index([kind, enabled])
+  @@index([enabled, nextRunAt])
+}
+
+/// Dedupe record of a trigger firing (redelivered webhooks / repeated ticks fire once).
+model TriggerFire {
+  id        String   @id @default(cuid())
+  triggerId String
+  dedupeKey String
+  runId     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  trigger Trigger @relation(fields: [triggerId], references: [id], onDelete: Cascade)
+
+  @@unique([triggerId, dedupeKey])
+}
+
+/// Shared session participant (spec §8.18).
+model SessionCollaborator {
+  id          String    @id @default(cuid())
+  sessionId   String
+  userId      String
+  role        ShareRole
+  invitedById String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  session   Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  user      User    @relation("SessionCollaboratorUser", fields: [userId], references: [id], onDelete: Cascade)
+  invitedBy User?   @relation("SessionCollaboratorInvitedBy", fields: [invitedById], references: [id], onDelete: SetNull)
+
+  @@unique([sessionId, userId])
+  @@index([userId])
+}
+
+model UsageEvent {
+  id        String   @id @default(cuid())
+  sessionId String
+  orgId     String
+  userId    String
+  model     String
+  tokensIn  Int
+  tokensOut Int
+  cacheRead Int
+  costUsd   Decimal  @db.Decimal(12, 6)
+  subagent  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  session Session      @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  org     Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  user    User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([orgId, createdAt])
+  @@index([orgId, subagent])
+}
+
+/// `orgId` is nullable (deviation from spec §9): user-level events such as
+/// sign-in/out, BYOK key changes and org deletion are not tied to a live org.
+///
+/// Phase 10: rows are immutable (DB trigger `loose_audit_log_guard`, see the phase10 migration) and
+/// hash-chained per `chain` (= orgId ?? 'global'). Rows written before Phase 10 have no chain/seq/hash.
+model AuditLog {
+  id          String   @id @default(cuid())
+  orgId       String?
+  actorId     String?
+  action      String
+  target      String?
+  meta        Json?
+  ip          String?
+  /// Hash chain key: orgId, or 'global' for user-level events.
+  chain       String?
+  /// 1-based position in the chain.
+  seq         Int?
+  prevHash    String?
+  /// HMAC-SHA256 over the canonical entry (phase10-design.md §2.2).
+  hash        String?
+  /// sha256('actor:' + actorId) — survives GDPR redaction of actorId.
+  actorDigest String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  org   Organization? @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  actor User?         @relation("AuditActor", fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@unique([chain, seq])
+  @@index([orgId, createdAt])
+  @@index([actorId, createdAt])
+  @@index([orgId, action, createdAt])
+}
+
+// ---------------------------------------------------------------- Phase 10: identity
+
+/// One SSO connection per org (spec §8.20). OIDC implemented; SAML behind the `sso_saml` flag.
+model SsoConnection {
+  id               String      @id @default(cuid())
+  orgId            String      @unique
+  protocol         SsoProtocol @default(OIDC)
+  enabled          Boolean     @default(false)
+  /// OIDC issuer (discovery at `<issuer>/.well-known/openid-configuration`).
+  issuer           String      @default("")
+  clientId         String      @default("")
+  /// Envelope-encrypted client secret (never returned).
+  clientSecretEnc  Bytes?
+  /// Cached discovery document + JWKS {discovery, jwks, fetchedAt}.
+  metadata         Json?
+  samlEntityId     String?
+  samlSsoUrl       String?
+  samlCertificate  String?
+  defaultRole      Role        @default(MEMBER)
+  jitProvisioning  Boolean     @default(true)
+  /// Require SSO for members whose email domain is a verified org domain.
+  enforce          Boolean     @default(false)
+  /// Owners may still sign in with Google/GitHub when SSO is enforced (break-glass).
+  allowOwnerBypass Boolean     @default(true)
+  lastLoginAt      DateTime?
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+
+  org        Organization  @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  identities SsoIdentity[]
+}
+
+model SsoIdentity {
+  id           String    @id @default(cuid())
+  connectionId String
+  userId       String
+  /// IdP subject (`sub` / NameID).
+  subject      String
+  email        String
+  lastLoginAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  connection SsoConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([connectionId, subject])
+  @@index([userId])
+}
+
+/// Email domain claimed by an org; verified via DNS TXT `_loose-verification.<domain>`.
+model OrgDomain {
+  id                String    @id @default(cuid())
+  orgId             String
+  domain            String
+  verificationToken String
+  verifiedAt        DateTime?
+  /// P10-SEC-010: equals `domain` while verified, else null — DB-enforced "verified by one org".
+  verifiedDomain    String?   @unique
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  org Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@unique([orgId, domain])
+  @@index([domain])
+}
+
+/// SCIM 2.0 bearer token (`loose_scim_…`); only the sha256 hash is stored.
+model ScimToken {
+  id          String    @id @default(cuid())
+  orgId       String
+  name        String
+  hash        String    @unique
+  lastUsedAt  DateTime?
+  createdById String?
+  revokedAt   DateTime?
+  /// P10-SEC-014: tokens expire (null only for rows inserted outside the service).
+  expiresAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  org Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@index([orgId])
+}
+
+/// A user provisioned into an org by SCIM. `active=false` = deprovisioned (membership removed).
+model ScimIdentity {
+  id          String   @id @default(cuid())
+  orgId       String
+  userId      String
+  externalId  String?
+  userName    String
+  displayName String?
+  active      Boolean  @default(true)
+  attributes  Json     @default("{}")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  org  Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  user User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([orgId, userId])
+  @@unique([orgId, userName])
+  @@index([orgId, externalId])
+}
+
+/// SCIM group; `role` maps members to an org role (highest mapped role wins).
+model ScimGroup {
+  id          String   @id @default(cuid())
+  orgId       String
+  externalId  String?
+  displayName String
+  role        Role?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  org     Organization      @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  members ScimGroupMember[]
+
+  @@unique([orgId, displayName])
+}
+
+model ScimGroupMember {
+  id        String   @id @default(cuid())
+  groupId   String
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  group ScimGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([groupId, userId])
+  @@index([userId])
+}
+
+/// 2FA recovery code; sha256(hex) of the normalized code, single use.
+model TotpRecoveryCode {
+  id        String    @id @default(cuid())
+  userId    String
+  hash      String    @unique
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// ---------------------------------------------------------------- Phase 10: governance
+
+/// GDPR/DPDP data export (async job; ZIP stored in ObjectStorage until expiresAt).
+model DataExport {
+  id            String           @id @default(cuid())
+  kind          DataExportKind
+  status        DataExportStatus @default(PENDING)
+  orgId         String?
+  requestedById String
+  storageKey    String?
+  bytes         Int?
+  error         String?
+  expiresAt     DateTime?
+  startedAt     DateTime?
+  completedAt   DateTime?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  org         Organization? @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  requestedBy User          @relation("DataExportRequestedBy", fields: [requestedById], references: [id], onDelete: Cascade)
+
+  @@index([requestedById, createdAt])
+  @@index([orgId, createdAt])
+  @@index([status, expiresAt])
+}
+
+/// Account / org deletion with a grace period (executed by the `deletion-sweep` job).
+model DeletionRequest {
+  id            String         @id @default(cuid())
+  kind          DeletionKind
+  status        DeletionStatus @default(PENDING)
+  userId        String?
+  orgId         String?
+  requestedById String?
+  scheduledFor  DateTime
+  cancelledAt   DateTime?
+  completedAt   DateTime?
+  error         String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  // SetNull: the (de-identified) request row is kept as proof of deletion.
+  user User?         @relation("DeletionRequestUser", fields: [userId], references: [id], onDelete: SetNull)
+  org  Organization? @relation(fields: [orgId], references: [id], onDelete: SetNull)
+
+  @@index([status, scheduledFor])
+  @@index([userId])
+  @@index([orgId])
+}
+
+/// Org-defined guardrail preset (built-in packs live in @loose/shared `BUILTIN_POLICY_PACKS`).
+model PolicyPack {
+  id          String   @id @default(cuid())
+  orgId       String
+  slug        String
+  name        String
+  description String   @default("")
+  version     Int      @default(1)
+  /// policyPackRulesSchema
+  rules       Json
+  createdById String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  org Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@unique([orgId, slug])
+}
+
+/// Singleton marker (P10-SEC-006): audit rows written *before* `cutoverAt` may legitimately be
+/// unchained (pre-Phase-10 history, sealed by the retention job). An unchained row at or after it is
+/// evidence of tampering and makes chain verification fail.
+model AuditChainCutover {
+  id        String   @id @default("singleton")
+  cutoverAt DateTime
+  createdAt DateTime @default(now())
+}
