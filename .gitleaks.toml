@@ -1,0 +1,28 @@
+title = "loose.ai gitleaks config"
+
+# Extend the default, well-maintained ruleset (AWS keys, GitHub/GitLab/Slack tokens, private
+# keys, generic high-entropy secrets, etc.) rather than redefining it.
+[extend]
+useDefault = true
+
+[allowlist]
+  description = "Known-fake credentials used only in tests and fixtures"
+
+  # Test files intentionally contain realistic-looking fake secrets (BYOK keys, GitHub tokens,
+  # MCP bearer tokens, Stripe-shaped keys in prompt-injection/golden-task fixtures) to assert
+  # they are redacted/never echoed back — see phase10.secrets.test.ts, phase10.prompt-injection.test.ts,
+  # phase10.simple-leak.test.ts, test/fixtures/goldenTasks.ts, and the pre-Phase10 crypto/keys/
+  # auth/errors/sessions/templates/translation/roleMatrix/delivery test suites.
+  paths = [
+    '''apps/server/test/.*''',
+    '''apps/web/src/.*\.test\.tsx?''',
+    '''packages/shared/src/.*\.test\.ts''',
+    '''packages/runner/src/agent/mock\.ts''',
+  ]
+
+  # Documentation and this file itself legitimately show secret *shapes* as examples.
+  regexes = [
+    '''sk-ant-api03-LEAKEDLEAKEDLEAKED[0-9]+''', # exact golden-task fixture value, belt-and-suspenders
+    '''sk-live-goldenTaskSecret[A-Za-z0-9]+''',
+    '''apiKey:\s*env\.E2B_API_KEY\s*\?\?\s*['"]{2}''', # reading an env var, not a literal key (lib/sandbox/index.ts)
+  ]
