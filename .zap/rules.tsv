@@ -1,0 +1,5 @@
+9999001	IGNORE	(placeholder) Add accepted ZAP rule-id exceptions here, one per line, with a reason comment above it.
+# Format: <rule id>\t<IGNORE|WARN|FAIL>\t(optional) URL regex
+# Example — if staging intentionally serves a dev-only banner that trips an info-disclosure
+# rule, document it here instead of silently failing the scan every run:
+# 10027	IGNORE
