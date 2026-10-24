@@ -40,7 +40,7 @@ jobs:
       # the full active scan (which can mutate data) and respects .zap/rules.tsv for
       # known/accepted findings (documented with a reason in that file).
       - name: ZAP baseline scan
-        uses: zaproxy/action-baseline@v0.14.0
+        uses: zaproxy/action-baseline@v0.15.0
         with:
           target: ${{ inputs.target_url }}
           rules_file_name: '.zap/rules.tsv'
