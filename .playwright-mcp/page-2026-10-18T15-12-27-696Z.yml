@@ -1,0 +1,265 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - banner [ref=e4]:
+      - link "loose.ai home" [ref=e5] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e6]:
+          - generic [ref=e7]: L
+          - generic [ref=e9]: loose.ai
+      - navigation "Primary navigation" [ref=e10]:
+        - link "Product" [ref=e11] [cursor=pointer]:
+          - /url: "#product"
+        - link "Providers" [ref=e12] [cursor=pointer]:
+          - /url: "#providers"
+        - link "How it works" [ref=e13] [cursor=pointer]:
+          - /url: "#how-it-works"
+      - generic [ref=e14]:
+        - link "Sign in" [ref=e15] [cursor=pointer]:
+          - /url: /signin
+        - link "Start building" [ref=e16] [cursor=pointer]:
+          - /url: /signup
+    - main [ref=e19]:
+      - generic [ref=e20]:
+        - generic [ref=e24]:
+          - generic [ref=e25]: The AI workspace where ideas become software
+          - heading "Make software. Not tickets." [level=1] [ref=e29]:
+            - generic [ref=e30]: Make software.
+            - generic [ref=e32]: Not tickets.
+          - paragraph [ref=e34]: Turn a conversation into real, reviewable code. loose.ai gives every team member a safe way to build, preview, and ship changes.
+          - generic [ref=e35]:
+            - link "Start building for free" [ref=e36] [cursor=pointer]:
+              - /url: /signup
+            - link "See how it works" [ref=e39] [cursor=pointer]:
+              - /url: "#product"
+          - paragraph [ref=e42]: Connect GitHub · Bring your own API key · No credit card required
+        - generic "loose.ai product preview" [ref=e44]:
+          - generic [ref=e46]:
+            - generic [ref=e47]:
+              - generic [ref=e48]: acme / storefront
+              - generic [ref=e54]: Preview live
+            - generic [ref=e56]:
+              - generic [ref=e57]:
+                - generic [ref=e59]:
+                  - generic [ref=e60]: Agent
+                  - generic [ref=e64]: Simple mode
+                - generic [ref=e65]:
+                  - generic [ref=e66]: Make the hero feel more premium and add a clear call to action.
+                  - generic [ref=e67]:
+                    - generic [ref=e68]: I’ll refine the typography, spacing, and primary action while keeping your current brand.
+                    - generic [ref=e74]:
+                      - generic [ref=e75]:
+                        - generic [ref=e76]: Agent is working
+                        - generic [ref=e78]: 00:18
+                      - generic [ref=e79]:
+                        - generic [ref=e85]:
+                          - generic [ref=e86]: Understanding your codebase
+                          - paragraph [ref=e90]: Found 12 relevant files
+                        - generic [ref=e99]:
+                          - generic [ref=e100]: Implementing the change
+                          - paragraph [ref=e104]: Editing Hero.tsx + styles
+                        - generic [ref=e112]:
+                          - generic [ref=e113]: Validating the result
+                          - paragraph [ref=e117]: Tests and responsive checks
+                        - generic [ref=e125]:
+                          - generic [ref=e126]: Preparing for review
+                          - paragraph [ref=e130]: Clean diff · no regressions
+                      - generic [ref=e132]: ✓ npm test 24 passed · build clean
+                - generic [ref=e134]:
+                  - text: Ask for another change…
+                  - button "Send message" [ref=e135]
+              - generic [ref=e138]:
+                - generic [ref=e139]: localhost:3000
+                - generic [ref=e141]:
+                  - generic [ref=e142]:
+                    - generic [ref=e143]: north°
+                    - generic [ref=e144]:
+                      - generic [ref=e145]: About
+                      - generic [ref=e146]: Work
+                      - generic [ref=e147]: Journal
+                    - generic [ref=e148]: Let’s talk
+                  - generic [ref=e152]:
+                    - paragraph [ref=e153]: Independent creative studio
+                    - paragraph [ref=e154]: Ideas that move culture forward.
+                    - paragraph [ref=e155]: Strategy, identity, and digital experiences for ambitious teams building what comes next.
+                    - generic [ref=e156]: Start a project
+                - generic [ref=e159]: Hero heading
+            - generic [ref=e162]:
+              - generic [ref=e163]:
+                - generic [ref=e164]: 3 files changed
+                - generic [ref=e168]: +84 −19
+              - generic [ref=e169]: Ready to review
+      - generic [ref=e175]:
+        - paragraph [ref=e176]: One workspace for everyone who shapes the product
+        - generic [ref=e177]:
+          - generic [ref=e178]: Product
+          - generic [ref=e183]: Engineering
+          - generic [ref=e188]: Design
+          - generic [ref=e192]: Growth
+          - generic [ref=e195]: Operations
+      - generic [ref=e199]:
+        - generic [ref=e200]:
+          - generic [ref=e201]:
+            - paragraph [ref=e202]: From thought to shipped
+            - heading "Your best ideas no longer wait in the backlog." [level=2] [ref=e203]
+          - paragraph [ref=e204]: A complete environment for making meaningful changes—without lowering the bar for quality.
+        - generic [ref=e205]:
+          - article [ref=e206]:
+            - generic [ref=e207]: "01"
+            - generic [ref=e212]:
+              - heading "Build in plain English" [level=3] [ref=e213]
+              - paragraph [ref=e214]: Describe what you want, not how to code it. loose.ai understands your repository, makes the change, and explains what happened.
+          - article [ref=e215]:
+            - generic [ref=e216]: "02"
+            - generic [ref=e224]:
+              - heading "See every change live" [level=3] [ref=e225]
+              - paragraph [ref=e226]: Watch your app update in a secure preview as the agent works. Click any element to point the conversation exactly where it needs to go.
+          - article [ref=e227]:
+            - generic [ref=e228]: "03"
+            - generic [ref=e235]:
+              - heading "Ship with confidence" [level=3] [ref=e236]
+              - paragraph [ref=e237]: Review the diff, rewind to a checkpoint, or open a focused pull request. You stay in control from first prompt to production-ready code.
+      - generic [ref=e239]:
+        - generic [ref=e240]:
+          - paragraph [ref=e241]: A complete agent workspace
+          - heading "More than a chat box. Everything the work needs." [level=2] [ref=e242]: More than a chat box.Everything the work needs.
+          - paragraph [ref=e243]: loose.ai surrounds the coding agent with the context, tools, guardrails, and delivery workflow required for real repositories—not toy demos.
+        - generic [ref=e244]:
+          - article [ref=e245]:
+            - generic [ref=e246]: "01"
+            - heading "Live preview" [level=3] [ref=e252]
+            - paragraph [ref=e253]: See every change in a real browser before it reaches a branch.
+          - article [ref=e254]:
+            - generic [ref=e255]: "02"
+            - heading "Safe checkpoints" [level=3] [ref=e261]
+            - paragraph [ref=e262]: Rewind code, conversation, or both at any point.
+          - article [ref=e263]:
+            - generic [ref=e264]: "03"
+            - heading "Plans and subagents" [level=3] [ref=e271]
+            - paragraph [ref=e272]: Approve the approach first, then let specialized agents execute in parallel.
+          - article [ref=e273]:
+            - generic [ref=e274]: "04"
+            - heading "Your tools, connected" [level=3] [ref=e279]
+            - paragraph [ref=e280]: Extend the agent with MCP servers, skills, hooks, and team commands.
+          - article [ref=e281]:
+            - generic [ref=e282]: "05"
+            - heading "Built for collaboration" [level=3] [ref=e290]
+            - paragraph [ref=e291]: Share sessions, hand over control, and keep everyone in the loop.
+          - article [ref=e292]:
+            - generic [ref=e293]: "06"
+            - heading "Model freedom" [level=3] [ref=e299]
+            - paragraph [ref=e300]: Bring your own model API key and stay in control of cost and capability.
+        - generic [ref=e301]:
+          - generic [ref=e302]:
+            - generic [ref=e303]:
+              - paragraph [ref=e304]: Bring your own provider
+              - heading "Your models. Your keys. Your choice." [level=2] [ref=e305]
+            - paragraph [ref=e306]: Use your own provider account, keep usage under your control, and choose the model that fits the work. Anthropic is available today, with more providers planned.
+          - generic [ref=e307]:
+            - article [ref=e308]:
+              - generic [ref=e309]: AI
+              - generic [ref=e313]:
+                - heading "Anthropic" [level=3] [ref=e314]
+                - paragraph [ref=e315]: Available now
+            - article [ref=e316]:
+              - generic [ref=e328]:
+                - heading "OpenAI" [level=3] [ref=e329]
+                - paragraph [ref=e330]: Planned
+            - article [ref=e331]:
+              - generic [ref=e337]:
+                - heading "Google Gemini" [level=3] [ref=e338]
+                - paragraph [ref=e339]: Planned
+            - article [ref=e340]:
+              - generic [ref=e347]:
+                - heading "AWS Bedrock" [level=3] [ref=e348]
+                - paragraph [ref=e349]: Planned
+            - article [ref=e350]:
+              - generic [ref=e357]:
+                - heading "Azure AI" [level=3] [ref=e358]
+                - paragraph [ref=e359]: Planned
+            - article [ref=e360]:
+              - generic [ref=e366]:
+                - heading "Mistral AI" [level=3] [ref=e367]
+                - paragraph [ref=e368]: Planned
+            - article [ref=e369]:
+              - generic [ref=e370]: xAI
+              - generic [ref=e374]:
+                - heading "xAI" [level=3] [ref=e375]
+                - paragraph [ref=e376]: Planned
+            - article [ref=e377]:
+              - generic [ref=e383]:
+                - heading "OpenRouter" [level=3] [ref=e384]
+                - paragraph [ref=e385]: Planned
+            - article [ref=e386]:
+              - generic [ref=e394]:
+                - heading "Cohere" [level=3] [ref=e395]
+                - paragraph [ref=e396]: Planned
+            - article [ref=e397]:
+              - generic [ref=e404]:
+                - heading "Groq" [level=3] [ref=e405]
+                - paragraph [ref=e406]: Planned
+          - generic [ref=e407]: Provider credentials are envelope-encrypted and are never shown again after they are saved.
+        - generic [ref=e413]:
+          - generic [ref=e414]:
+            - generic [ref=e415]: Simple mode
+            - heading "For everyone with an idea." [level=3] [ref=e420]
+            - paragraph [ref=e421]: Plain-English conversations, visual element selection, safe quick actions, and a live preview—without exposing code or terminal complexity.
+            - list [ref=e422]:
+              - listitem [ref=e423]: Click an element and describe the change
+              - listitem [ref=e426]: Follow a clear, jargon-free progress story
+              - listitem [ref=e429]: Review the result visually before delivery
+          - generic [ref=e432]:
+            - generic [ref=e433]: Pro mode
+            - heading "For developers who want the details." [level=3] [ref=e437]
+            - paragraph [ref=e438]: Inspect diffs, files, tool calls, plans, terminal output, context usage, and checkpoints while the agent works.
+            - list [ref=e439]:
+              - listitem [ref=e440]: Approve plans and sensitive tool calls
+              - listitem [ref=e443]: Inspect every diff, command, and timeline event
+              - listitem [ref=e446]: Rewind, fork, commit, or open a pull request
+      - generic [ref=e450]:
+        - generic [ref=e451]:
+          - paragraph [ref=e452]: One simple loop
+          - heading "Describe it. Watch it happen. Ship it." [level=2] [ref=e453]
+          - paragraph [ref=e454]: No environment setup. No copy-pasting between tools. Just a direct path from intent to working software.
+        - generic [ref=e455]:
+          - generic [ref=e457]:
+            - generic [ref=e458]: "01"
+            - heading "Describe" [level=3] [ref=e463]
+            - paragraph [ref=e464]: Ask for a feature, fix, or redesign.
+          - generic [ref=e468]:
+            - generic [ref=e469]: "02"
+            - heading "Watch" [level=3] [ref=e475]
+            - paragraph [ref=e476]: See the agent work and preview it live.
+          - generic [ref=e480]:
+            - generic [ref=e481]: "03"
+            - heading "Deliver" [level=3] [ref=e488]
+            - paragraph [ref=e489]: Review the change and open a clean PR.
+        - generic [ref=e490]:
+          - generic [ref=e491]: Real terminal
+          - generic [ref=e494]: Reviewable diffs
+          - generic [ref=e499]: Automatic checkpoints
+          - generic [ref=e504]: Native GitHub delivery
+    - contentinfo [ref=e508]:
+      - generic [ref=e509]:
+        - generic [ref=e510]:
+          - generic [ref=e511]:
+            - generic [ref=e512]:
+              - generic [ref=e513]: L
+              - generic [ref=e515]: loose.ai
+            - paragraph [ref=e516]: A safer, clearer way for every team to make software together.
+          - generic [ref=e517]:
+            - generic [ref=e518]:
+              - paragraph [ref=e519]: Product
+              - link "Overview" [ref=e520] [cursor=pointer]:
+                - /url: "#product"
+              - link "Providers" [ref=e521] [cursor=pointer]:
+                - /url: "#providers"
+            - generic [ref=e522]:
+              - paragraph [ref=e523]: Get started
+              - link "Create account" [ref=e524] [cursor=pointer]:
+                - /url: /signup
+              - link "Sign in" [ref=e525] [cursor=pointer]:
+                - /url: /signin
+        - generic [ref=e526]:
+          - paragraph [ref=e527]: © 2026 loose.ai. Built for people who build.
+          - paragraph [ref=e528]: Private by design. Human in control.
+  - region "Notifications alt+T"
