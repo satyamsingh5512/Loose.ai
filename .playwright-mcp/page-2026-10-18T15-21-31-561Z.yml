@@ -1,0 +1,627 @@
+- generic [active] [ref=e1]:
+  - banner:
+    - generic [ref=e2]:
+      - link "Skip to main content":
+        - /url: "#main"
+      - generic [ref=e4]:
+        - link "OpenAI Home" [ref=e5] [cursor=pointer]:
+          - /url: /
+        - generic [ref=e10]:
+          - navigation "Main Navigation" [ref=e12]:
+            - list [ref=e13]:
+              - listitem [ref=e14]:
+                - link "Research" [ref=e15] [cursor=pointer]:
+                  - /url: /research/index/
+                - button "Research menu"
+              - listitem [ref=e18]:
+                - button "Products" [ref=e19] [cursor=pointer]
+                - button "Products menu"
+              - listitem [ref=e22]:
+                - link "Business" [ref=e23] [cursor=pointer]:
+                  - /url: /business/
+                - button "Business menu"
+              - listitem [ref=e26]:
+                - link "Developers" [ref=e27] [cursor=pointer]:
+                  - /url: /api/
+                - button "Developers menu"
+              - listitem [ref=e30]:
+                - link "Company" [ref=e31] [cursor=pointer]:
+                  - /url: /about/
+                - button "Company menu"
+              - listitem [ref=e34]:
+                - link "Foundation (opens in a new window)" [ref=e35] [cursor=pointer]:
+                  - /url: https://openaifoundation.org
+                  - generic [ref=e36]: Foundation
+                  - generic [ref=e38]: (opens in a new window)
+          - generic [ref=e40]:
+            - button "Open Search" [ref=e42] [cursor=pointer]
+            - button "Close Search" [ref=e44] [cursor=pointer]
+          - generic [ref=e47]:
+            - button "Log in" [ref=e48] [cursor=pointer]
+            - link "Try ChatGPT (opens in a new window)" [ref=e51] [cursor=pointer]:
+              - /url: https://chatgpt.com/
+              - text: Try ChatGPT
+              - generic [ref=e54]: (opens in a new window)
+  - generic [ref=e55]:
+    - main [ref=e56]:
+      - generic [ref=e57]: OpenAI
+      - generic [ref=e58]:
+        - generic [ref=e63]:
+          - heading "Design Guidelines" [level=1] [ref=e65]
+          - link "Contact" [ref=e68] [cursor=pointer]:
+            - /url: "#contact"
+        - generic [ref=e76]:
+          - heading "Introduction" [level=2] [ref=e80]
+          - paragraph [ref=e85]: The "OpenAI" name, the OpenAI logo, the "ChatGPT" and “GPT” brands, and other OpenAI trademarks, are property of OpenAI. These guidelines are intended to help our partners, resellers, customers, developers, consultants, publishers, and any other third parties understand how to use and display our trademarks and copyrighted work in their own assets and materials.
+        - generic [ref=e86]:
+          - heading "Logo" [level=2] [ref=e90]
+          - generic [ref=e92]:
+            - generic [ref=e93]:
+              - heading "Wordmark" [level=2] [ref=e97]
+              - paragraph [ref=e102]:
+                - generic [ref=e103]: Our wordmark is the most direct distillation of our visual philosophy. It is crafted with OpenAI Sans, with the 'O' formed as a perfect circle.While it can freely scale in size, the balance and proportions are fixed to give consistency across our range of products, services and departments. It can also appear in different forms depending on context and degree of recognition our branding has at a given time or geographic location.
+            - generic [ref=e107]:
+              - img "OpenAI logo" [ref=e111]
+              - paragraph [ref=e117]: Our primary wordmark requires prescribed clear space and should NOT be used with the Blossom.
+        - generic [ref=e120]:
+          - 'heading "Dos and Don’ts: Wordmark" [level=3] [ref=e125]'
+          - generic [ref=e127]:
+            - generic [ref=e129]:
+              - img "DON'T stretch or alter wordmark in any way" [ref=e134]
+              - paragraph [ref=e141]:
+                - generic [ref=e142]: DON'T
+                - text: stretch or alter wordmark in any way
+            - generic [ref=e144]:
+              - img "DON'T use the Blossom as the primary branding" [ref=e149]
+              - paragraph [ref=e156]:
+                - generic [ref=e157]: DON'T
+                - text: use the Blossom as the primary branding
+            - generic [ref=e159]:
+              - img "DON'T crop wordmarks" [ref=e164]
+              - paragraph [ref=e171]:
+                - generic [ref=e172]: DON'T
+                - text: crop wordmarks
+          - generic [ref=e174]:
+            - generic [ref=e176]:
+              - img "DON'T use wordmarks as masks" [ref=e181]
+              - paragraph [ref=e188]:
+                - generic [ref=e189]: DON'T
+                - text: use wordmarks as masks
+            - generic [ref=e191]:
+              - img "DON'T use any unapproved variations" [ref=e196]
+              - paragraph [ref=e203]:
+                - generic [ref=e204]: DON'T
+                - text: use any unapproved variations
+            - generic [ref=e206]:
+              - img "DON'T use any effects or textures" [ref=e211]
+              - paragraph [ref=e218]:
+                - generic [ref=e219]: DON'T
+                - text: use any effects or textures
+        - generic [ref=e220]:
+          - heading "Blossom" [level=2] [ref=e224]
+          - generic [ref=e226]:
+            - paragraph [ref=e229]: The Blossom logo is more than just a visual symbol; it represents the core philosophy that guides our approach to design and innovation. At its heart, the logo captures the dynamic intersection between humanity and technology—two forces that shape our world and inspire our work. The design embodies the fluidity and warmth of human-centered thinking through the use of circles, while right angles introduce the precision and structure that technology demands.
+            - generic [ref=e233]:
+              - img "OpenAI Blossom" [ref=e238]
+              - paragraph [ref=e244]: Use the prescribed spacing to let the Blossom breathe.
+            - generic [ref=e246]:
+              - generic [ref=e249] [cursor=pointer]:
+                - checkbox "By using our logos, you agree to our Marks usage terms." [ref=e251]
+                - generic [ref=e253]:
+                  - text: By using our logos, you agree to our Marks
+                  - link "usage terms" [ref=e254]:
+                    - /url: "#usage-terms"
+                  - text: .
+              - button "Download logos" [disabled] [ref=e255]
+        - generic [ref=e258]:
+          - 'heading "Dos and Don’ts: Blossom" [level=3] [ref=e263]'
+          - generic [ref=e265]:
+            - generic [ref=e267]:
+              - img "DON'T add any colors to the Blossom" [ref=e272]
+              - paragraph [ref=e279]:
+                - generic [ref=e280]: DON'T
+                - text: add any colors to the Blossom
+            - generic [ref=e282]:
+              - img "DON'T use the Blossom as the primary branding" [ref=e287]
+              - paragraph [ref=e294]:
+                - generic [ref=e295]: DON'T
+                - text: use the Blossom as the primary branding
+            - generic [ref=e297]:
+              - img "DON'T add any unauthorized elements" [ref=e302]
+              - paragraph [ref=e309]:
+                - generic [ref=e310]: DON'T
+                - text: add any unauthorized elements
+          - generic [ref=e312]:
+            - generic [ref=e314]:
+              - img "DON'T use the Blossom over a busy image" [ref=e318]
+              - paragraph [ref=e325]:
+                - generic [ref=e326]: DON'T
+                - text: use the Blossom over a busy image
+            - generic [ref=e328]:
+              - img "DO use the established spacing rules" [ref=e333]
+              - paragraph [ref=e340]:
+                - generic [ref=e341]: DO
+                - text: use the established spacing rules
+            - generic [ref=e343]:
+              - img "DO use the Blossom with lots of open space" [ref=e348]
+              - paragraph [ref=e355]:
+                - generic [ref=e356]: DO
+                - text: use the Blossom with lots of open space
+        - generic [ref=e357]:
+          - heading "How to use our Logos" [level=2] [ref=e361]
+          - generic [ref=e366]:
+            - generic [ref=e368]:
+              - paragraph [ref=e369]:
+                - generic [ref=e370]: "Do:"
+              - list [ref=e371]:
+                - listitem [ref=e372]:
+                  - paragraph [ref=e376]:
+                    - generic [ref=e377]: Use the logo only when it directly relates to OpenAI services.
+                - listitem [ref=e378]:
+                  - paragraph [ref=e382]:
+                    - generic [ref=e383]: Follow OpenAI’s style guides and usage terms.
+                - listitem [ref=e384]:
+                  - paragraph [ref=e388]:
+                    - generic [ref=e389]: Use the logo exactly as provided and acknowledge that it belongs to OpenAI.
+            - generic [ref=e391]:
+              - paragraph [ref=e392]:
+                - generic [ref=e393]: "Don’t:"
+              - list [ref=e394]:
+                - listitem [ref=e395]:
+                  - paragraph [ref=e399]:
+                    - generic [ref=e400]: Use the logo without permission or outside OpenAI’s terms.
+                - listitem [ref=e401]:
+                  - paragraph [ref=e405]:
+                    - generic [ref=e406]: Misrepresent your relationship with OpenAI, imply endorsement, or confuse users about sponsorship.
+                - listitem [ref=e407]:
+                  - paragraph [ref=e411]:
+                    - generic [ref=e412]: Use the logo more prominently than your own or in unrelated contexts.
+                - listitem [ref=e413]:
+                  - paragraph [ref=e417]:
+                    - generic [ref=e418]: Place the logo on tangible merchandise, promotional items, or modify it in any way.
+                - listitem [ref=e419]:
+                  - paragraph [ref=e423]:
+                    - generic [ref=e424]: Incorporate the logo into your own branding, trademark, or design a similar logo.
+        - generic [ref=e427]:
+          - heading "Gallery" [level=2] [ref=e432]
+          - generic [ref=e433]:
+            - generic [ref=e435]:
+              - button "Previous slide" [ref=e437] [cursor=pointer]
+              - button "Next slide" [ref=e440] [cursor=pointer]
+            - generic:
+              - generic:
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic:
+                          - img "A simple white card with the OpenAI logo in bold black text centered on the page, highlighting minimalistic branding."
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic:
+                          - img "A poster showcasing the word “OpenAI” in decreasing font sizes from 150 pt to 18 pt, arranged in a cascading format on a white background."
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic:
+                          - 'img "A blue hoodie hanging on a wooden rod against a plain white background. The back reads in white text: “CALL TOLL FREE 1-800-CHATGPT OPEN 24/7,” promoting availability."'
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic:
+                          - img "A poster featuring the OpenAI logo in bold white font centered over a background of a clear blue sky and tree canopies, with orange butterflies flying throughout."
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic:
+                          - img "A set of five OpenAI research paper covers arranged side by side. Each cover is a different pastel shade (blue, yellow, orange, green, and pink) with bold black titles describing various AI topics."
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic:
+                          - img "A long-sleeve white t-shirt hanging on a wooden rod. It features a large, gradient blue circle graphic on the back, blending light to dark hues."
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic:
+                          - img "A white hardcover book titled “OpenAI Guidelines” with minimalistic text. The book lies on a light gray surface, styled with clean, geometric shadows."
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic:
+                          - img "Series of posters displaying OpenAI Sans and logos"
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic:
+                          - 'img "OpenAI Research Deliberate Alignment: Reasoning enables safer language models booklet"'
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic:
+                          - img "A minimalistic OpenAI stationery set, including 2 pens and an envelope, all featuring clean typography and OpenAI branding."
+        - generic [ref=e442]:
+          - heading "Brand partnerships" [level=2] [ref=e446]
+          - generic [ref=e448]:
+            - paragraph [ref=e451]:
+              - generic [ref=e452]: When pairing the wordmarks with partner logos, maintain balanced spacing and clear hierarchy. Avoid placing logos too close to one another, ensuring sufficient space to preserve clarity and visual impact. Ensure each logo is displayed at an appropriate size, uses its approved color format, and is not distorted or altered in any way.
+              - text: All co-branded materials must undergo an approval process by both brands to guarantee consistency and adherence to branding standards.
+            - img "OpenAI Partnerships" [ref=e461]
+        - generic [ref=e467]:
+          - 'heading "Dos and Don’ts: Brand partnerships" [level=3] [ref=e472]'
+          - generic [ref=e474]:
+            - generic [ref=e476]:
+              - img "DON'T add any colors to the partnership lockup" [ref=e481]
+              - paragraph [ref=e488]:
+                - generic [ref=e489]: DON'T
+                - text: add any colors to the partnership lockup
+            - generic [ref=e491]:
+              - img "DON'T use the wordmark as very different sizes" [ref=e496]
+              - paragraph [ref=e503]:
+                - generic [ref=e504]: DON'T
+                - text: use the wordmark as very different sizes
+            - generic [ref=e506]:
+              - img "DON'T use the blossom with the partnership lock-up" [ref=e511]
+              - paragraph [ref=e518]:
+                - generic [ref=e519]: DON'T
+                - text: use the blossom with the partnership lock-up
+          - generic [ref=e521]:
+            - generic [ref=e523]:
+              - img "DON'T use the partnership lockup over a busy image" [ref=e527]
+              - paragraph [ref=e534]:
+                - generic [ref=e535]: DON'T
+                - text: use the partnership lockup over a busy image
+            - generic [ref=e537]:
+              - img "DO use the established spacing rules" [ref=e542]
+              - paragraph [ref=e549]:
+                - generic [ref=e550]: DO
+                - text: use the established spacing rules
+            - generic [ref=e552]:
+              - img "DO strive to have the wordmarks be the same height" [ref=e557]
+              - paragraph [ref=e564]:
+                - generic [ref=e565]: DO
+                - text: strive to have the wordmarks be the same height
+          - list [ref=e567]:
+            - listitem [ref=e568]:
+              - link "Download" [ref=e569] [cursor=pointer]:
+                - /url: https://cdn.openai.com/brand/OpenAI-Partnership-Templates-2025.zip
+        - generic [ref=e570]:
+          - heading "Typography" [level=2] [ref=e574]
+          - generic [ref=e576]:
+            - paragraph [ref=e579]:
+              - generic [ref=e580]: OpenAI Sans blends geometric precision and functionality with a rounded, approachable character. Subtle modifications, such as smoother curves and bespoke letterforms, give it a friendly and circular appearance.The typeface is available in five core weights—Light, Regular, Medium, Semibold and Bold—each paired with a corresponding italic style. OpenAI Sans also features unique alignment and glyph refinements tailored for clarity and versatility in both digital and print applications. Its OpenType features, such as ligatures, tabular figures, and case-sensitive punctuation, provide added functionality for professional use.Designed to represent OpenAI’s brand ethos, the font strikes a balance between technological precision and humanistic warmth, embodying a future-forward and inclusive tone. The design choices reflect its role in supporting OpenAI’s mission of benefiting all of humanity.
+            - img "OpenAI Typography" [ref=e589]
+            - paragraph [ref=e592]:
+              - text: Get access to OpenAI Sans through our
+              - link "full design guidelines⁠ (opens in a new window)" [ref=e593] [cursor=pointer]:
+                - /url: http://brand.openai.com/
+                - generic [ref=e594]: full design guidelines
+                - text: ⁠
+                - generic [ref=e595]: (opens in a new window)
+        - generic [ref=e598]:
+          - 'heading "Dos and Don''ts: Language" [level=3] [ref=e603]'
+          - generic [ref=e606]:
+            - generic [ref=e607]:
+              - generic [ref=e609]:
+                - heading "GPTs" [level=4] [ref=e611]
+                - generic [ref=e612]: Read more
+              - button "Read more" [ref=e618] [cursor=pointer]
+            - generic [ref=e619]:
+              - generic [ref=e621]:
+                - heading "API Developers" [level=4] [ref=e623]
+                - generic [ref=e624]: Read more
+              - button "Read more" [ref=e630] [cursor=pointer]
+            - generic [ref=e631]:
+              - generic [ref=e633]:
+                - heading "Models" [level=4] [ref=e635]
+                - generic [ref=e636]: Read more
+              - button "Read more" [ref=e642] [cursor=pointer]
+            - generic [ref=e643]:
+              - generic [ref=e645]:
+                - heading "Non-partnerships" [level=4] [ref=e647]
+                - generic [ref=e648]: Read more
+              - button "Read more" [ref=e654] [cursor=pointer]
+            - generic [ref=e655]:
+              - generic [ref=e657]:
+                - heading "Content attribution" [level=4] [ref=e659]
+                - generic [ref=e660]: Read more
+              - button "Read more" [ref=e666] [cursor=pointer]
+        - generic [ref=e667]:
+          - heading "Contact" [level=2] [ref=e671]
+          - paragraph [ref=e676]:
+            - text: For legal inquiries, please contact
+            - link "legal@openai.com⁠" [ref=e677] [cursor=pointer]:
+              - /url: mailto:legal@openai.com
+            - generic [ref=e678]: ⁠.
+            - text: For everything else, including permission requests for the use of our logos, questions about these guidelines, or communications that go beyond the cases outlined above, please contact
+            - link "partnercomms@openai.com⁠⁠" [ref=e679] [cursor=pointer]:
+              - /url: mailto:partnercomms@openai.com
+            - text: .
+        - generic [ref=e680]:
+          - heading "Press releases" [level=2] [ref=e684]
+          - paragraph [ref=e689]:
+            - text: When mentioning our company in press materials, please identify OpenAl as an Al research and deployment company. OpenAl's mission is to ensure that artificial general intelligence—AI systems that are generally smarter than humans—benefits all of humanity
+            - generic [ref=e690]: .If announcements, blogs, or other communications go beyond the cases outlined above, or if you have questions about our guidelines, reach out to OpenAI's Partner Communications team at
+            - link "partnercomms@openai.com⁠" [ref=e691] [cursor=pointer]:
+              - /url: mailto:partnercomms@openai.com
+            - text: ⁠.
+        - generic [ref=e692]:
+          - heading "Usage terms" [level=2] [ref=e696]
+          - generic [ref=e700]:
+            - paragraph [ref=e701]: The term "Marks" includes anything we use to identify our goods or services, including our names, logos, icons, and design elements. By using OpenAl's Marks, you agree that we own them and that any goodwill generated by your use benefits us.
+            - paragraph [ref=e702]: "Permission to use our Marks is limited in the following ways:"
+            - list [ref=e703]:
+              - listitem [ref=e704]:
+                - paragraph [ref=e705]: Only use our Marks if they adhere to these brand guidelines.
+              - listitem [ref=e706]:
+                - paragraph [ref=e707]: The permission we grant is non-exclusive (we can give it to others) and non-transferrable (you cannot give it to others).
+              - listitem [ref=e708]:
+                - paragraph [ref=e709]: Do not feature our Marks more prominently than your own company's name or marks.
+              - listitem [ref=e710]:
+                - paragraph [ref=e711]: We may update the guide, and changes must be made in accordance with our updates within a reasonable time.
+              - listitem [ref=e712]:
+                - paragraph [ref=e713]: We can review the use of our Marks and require changes if needed.
+              - listitem [ref=e714]:
+                - paragraph [ref=e715]: We may terminate permission to use our Marks at any time, and usage must stop promptly.
+            - paragraph [ref=e716]: Please ensure your app follows all OpenAl usage policies. If your project leverages our APIs or models (e.g. GPT‑4 or DALL·E 3), you may choose to reference a specific model but be precise and accurate.
+            - paragraph [ref=e717]: We do not permit model names in app titles because there is concern that it confuses end users. It also triggers our enforcement mechanisms. GPTs are custom versions of ChatGPT, so it’s important not to simply reference GPT in your app descriptions (we do not permit our GPT brand to be used in app, product, developer or company names).
+    - contentinfo [ref=e718]:
+      - generic [ref=e720]:
+        - generic [ref=e721]:
+          - generic [ref=e722]:
+            - heading "Research" [level=2] [ref=e723]
+            - list [ref=e724]:
+              - listitem [ref=e725]:
+                - link "Research Index" [ref=e726] [cursor=pointer]:
+                  - /url: /research/index/
+              - listitem [ref=e727]:
+                - link "Research Overview" [ref=e728] [cursor=pointer]:
+                  - /url: /research/
+              - listitem [ref=e729]:
+                - link "Economic Research" [ref=e730] [cursor=pointer]:
+                  - /url: /signals/
+          - generic [ref=e731]:
+            - heading "Latest Advancements" [level=2] [ref=e732]
+            - list [ref=e733]:
+              - listitem [ref=e734]:
+                - link "GPT-6.1 Sol" [ref=e735] [cursor=pointer]:
+                  - /url: /index/introducing-gpt-6-1-sol/
+              - listitem [ref=e736]:
+                - link "GPT-6 Astra" [ref=e737] [cursor=pointer]:
+                  - /url: /index/gpt-6-astra/
+              - listitem [ref=e738]:
+                - link "GPT-5.6" [ref=e739] [cursor=pointer]:
+                  - /url: /index/gpt-5-6/
+              - listitem [ref=e740]:
+                - link "GPT-5.5" [ref=e741] [cursor=pointer]:
+                  - /url: /index/introducing-gpt-5-5/
+          - generic [ref=e742]:
+            - heading "Safety" [level=2] [ref=e743]
+            - list [ref=e744]:
+              - listitem [ref=e745]:
+                - link "Safety Approach" [ref=e746] [cursor=pointer]:
+                  - /url: /safety/
+              - listitem [ref=e747]:
+                - link "Deployment Safety (opens in a new window)" [ref=e748] [cursor=pointer]:
+                  - /url: https://deploymentsafety.openai.com/
+                  - text: Deployment Safety
+                  - generic [ref=e751]: (opens in a new window)
+              - listitem [ref=e752]:
+                - link "Security & Privacy" [ref=e753] [cursor=pointer]:
+                  - /url: /security-and-privacy/
+              - listitem [ref=e754]:
+                - link "Trust & Transparency" [ref=e755] [cursor=pointer]:
+                  - /url: /trust-and-transparency/
+        - generic [ref=e756]:
+          - generic [ref=e757]:
+            - heading "Products" [level=2] [ref=e758]
+            - list [ref=e759]:
+              - listitem [ref=e760]:
+                - link "ChatGPT (opens in a new window)" [ref=e761] [cursor=pointer]:
+                  - /url: https://chatgpt.com/
+                  - text: ChatGPT
+                  - generic [ref=e764]: (opens in a new window)
+              - listitem [ref=e765]:
+                - link "ChatGPT Business (opens in a new window)" [ref=e766] [cursor=pointer]:
+                  - /url: https://chatgpt.com/business/
+                  - text: ChatGPT Business
+                  - generic [ref=e769]: (opens in a new window)
+              - listitem [ref=e770]:
+                - link "ChatGPT Enterprise (opens in a new window)" [ref=e771] [cursor=pointer]:
+                  - /url: https://chatgpt.com/business/enterprise/
+                  - text: ChatGPT Enterprise
+                  - generic [ref=e774]: (opens in a new window)
+              - listitem [ref=e775]:
+                - link "ChatGPT for Education (opens in a new window)" [ref=e776] [cursor=pointer]:
+                  - /url: https://chatgpt.com/business/education/
+                  - text: ChatGPT for Education
+                  - generic [ref=e779]: (opens in a new window)
+              - listitem [ref=e780]:
+                - link "Codex" [ref=e781] [cursor=pointer]:
+                  - /url: https://chatgpt.com/codex/
+              - listitem [ref=e782]:
+                - link "Dots (opens in a new window)" [ref=e783] [cursor=pointer]:
+                  - /url: https://chatgpt.com/features/dots
+                  - text: Dots
+                  - generic [ref=e786]: (opens in a new window)
+              - listitem [ref=e787]:
+                - link "Release Notes" [ref=e788] [cursor=pointer]:
+                  - /url: /products/release-notes/
+          - generic [ref=e789]:
+            - heading "API Platform" [level=2] [ref=e790]
+            - list [ref=e791]:
+              - listitem [ref=e792]:
+                - link "Overview" [ref=e793] [cursor=pointer]:
+                  - /url: /api/
+              - listitem [ref=e794]:
+                - link "API Log In (opens in a new window)" [ref=e795] [cursor=pointer]:
+                  - /url: https://platform.openai.com/login
+                  - text: API Log In
+                  - generic [ref=e798]: (opens in a new window)
+              - listitem [ref=e799]:
+                - link "Docs (opens in a new window)" [ref=e800] [cursor=pointer]:
+                  - /url: https://developers.openai.com/api/docs
+                  - text: Docs
+                  - generic [ref=e803]: (opens in a new window)
+        - generic [ref=e804]:
+          - generic [ref=e805]:
+            - heading "Business" [level=2] [ref=e806]
+            - list [ref=e807]:
+              - listitem [ref=e808]:
+                - link "Overview" [ref=e809] [cursor=pointer]:
+                  - /url: /business/
+              - listitem [ref=e810]:
+                - link "Solutions" [ref=e811] [cursor=pointer]:
+                  - /url: /solutions/
+              - listitem [ref=e812]:
+                - link "Resources" [ref=e813] [cursor=pointer]:
+                  - /url: /business/learn/
+              - listitem [ref=e814]:
+                - link "Plugins" [ref=e815] [cursor=pointer]:
+                  - /url: /business/plugins/
+              - listitem [ref=e816]:
+                - link "Customer Stories" [ref=e817] [cursor=pointer]:
+                  - /url: /business/customer-stories/
+              - listitem [ref=e818]:
+                - link "Partner Network" [ref=e819] [cursor=pointer]:
+                  - /url: /business/partners/
+              - listitem [ref=e820]:
+                - link "Contact Sales" [ref=e821] [cursor=pointer]:
+                  - /url: /contact-sales/
+          - generic [ref=e822]:
+            - heading "Developers" [level=2] [ref=e823]
+            - list [ref=e824]:
+              - listitem [ref=e825]:
+                - link "Apps SDK (opens in a new window)" [ref=e826] [cursor=pointer]:
+                  - /url: https://developers.openai.com/apps-sdk
+                  - text: Apps SDK
+                  - generic [ref=e829]: (opens in a new window)
+              - listitem [ref=e830]:
+                - link "Open Models" [ref=e831] [cursor=pointer]:
+                  - /url: /open-models/
+              - listitem [ref=e832]:
+                - link "Docs (opens in a new window)" [ref=e833] [cursor=pointer]:
+                  - /url: https://developers.openai.com/
+                  - text: Docs
+                  - generic [ref=e836]: (opens in a new window)
+              - listitem [ref=e837]:
+                - link "Resources (opens in a new window)" [ref=e838] [cursor=pointer]:
+                  - /url: https://developers.openai.com/learn
+                  - text: Resources
+                  - generic [ref=e841]: (opens in a new window)
+              - listitem [ref=e842]:
+                - link "Developer Forum (opens in a new window)" [ref=e843] [cursor=pointer]:
+                  - /url: https://community.openai.com/
+                  - text: Developer Forum
+                  - generic [ref=e846]: (opens in a new window)
+        - generic [ref=e847]:
+          - generic [ref=e848]:
+            - heading "Company" [level=2] [ref=e849]
+            - list [ref=e850]:
+              - listitem [ref=e851]:
+                - link "About Us" [ref=e852] [cursor=pointer]:
+                  - /url: /about/
+              - listitem [ref=e853]:
+                - link "Our Charter" [ref=e854] [cursor=pointer]:
+                  - /url: /charter/
+              - listitem [ref=e855]:
+                - link "Careers" [ref=e856] [cursor=pointer]:
+                  - /url: /careers/
+              - listitem [ref=e857]:
+                - link "News" [ref=e858] [cursor=pointer]:
+                  - /url: /news/
+          - generic [ref=e859]:
+            - heading "Support" [level=2] [ref=e860]
+            - list [ref=e861]:
+              - listitem [ref=e862]:
+                - link "Help Center (opens in a new window)" [ref=e863] [cursor=pointer]:
+                  - /url: https://help.openai.com/
+                  - text: Help Center
+                  - generic [ref=e866]: (opens in a new window)
+              - listitem [ref=e867]:
+                - link "OpenAI Status (opens in a new window)" [ref=e868] [cursor=pointer]:
+                  - /url: https://status.openai.com
+                  - text: OpenAI Status
+                  - generic [ref=e871]: (opens in a new window)
+        - generic [ref=e872]:
+          - generic [ref=e873]:
+            - heading "More" [level=2] [ref=e874]
+            - list [ref=e875]:
+              - listitem [ref=e876]:
+                - link "Stories" [ref=e877] [cursor=pointer]:
+                  - /url: /stories/
+              - listitem [ref=e878]:
+                - link "Academy" [ref=e879] [cursor=pointer]:
+                  - /url: /academy/
+              - listitem [ref=e880]:
+                - link "Supply Co." [ref=e881] [cursor=pointer]:
+                  - /url: /supply/
+              - listitem [ref=e882]:
+                - link "Livestreams" [ref=e883] [cursor=pointer]:
+                  - /url: /live/
+              - listitem [ref=e884]:
+                - link "Podcast" [ref=e885] [cursor=pointer]:
+                  - /url: /podcast/
+              - listitem [ref=e886]:
+                - link "RSS" [ref=e887] [cursor=pointer]:
+                  - /url: https://openai.com/news/rss.xml
+          - generic [ref=e888]:
+            - heading "Terms & Policies" [level=2] [ref=e889]
+            - list [ref=e890]:
+              - listitem [ref=e891]:
+                - link "Terms of Use" [ref=e892] [cursor=pointer]:
+                  - /url: /policies/terms-of-use/
+              - listitem [ref=e893]:
+                - link "Privacy Policy" [ref=e894] [cursor=pointer]:
+                  - /url: /policies/privacy-policy/
+              - listitem [ref=e895]:
+                - link "Other Policies" [ref=e896] [cursor=pointer]:
+                  - /url: /policies/
+      - generic [ref=e897]:
+        - generic [ref=e898]:
+          - link "X (opens in a new window)" [ref=e899] [cursor=pointer]:
+            - /url: https://x.com/OpenAI
+            - generic [ref=e901]: (opens in a new window)
+          - link "YouTube (opens in a new window)" [ref=e902] [cursor=pointer]:
+            - /url: https://www.youtube.com/OpenAI
+            - generic [ref=e904]: (opens in a new window)
+          - link "LinkedIn (opens in a new window)" [ref=e905] [cursor=pointer]:
+            - /url: https://www.linkedin.com/company/openai
+            - generic [ref=e907]: (opens in a new window)
+          - link "GitHub (opens in a new window)" [ref=e908] [cursor=pointer]:
+            - /url: https://github.com/openai
+            - generic [ref=e910]: (opens in a new window)
+          - link "Instagram (opens in a new window)" [ref=e911] [cursor=pointer]:
+            - /url: https://www.instagram.com/openai/
+            - generic [ref=e913]: (opens in a new window)
+          - link "TikTok (opens in a new window)" [ref=e914] [cursor=pointer]:
+            - /url: https://www.tiktok.com/@openai
+            - generic [ref=e916]: (opens in a new window)
+          - link "Discord (opens in a new window)" [ref=e917] [cursor=pointer]:
+            - /url: https://discord.gg/openai
+            - generic [ref=e920]: (opens in a new window)
+        - generic [ref=e921]:
+          - generic [ref=e922]: OpenAI © 2015–2026
+          - button "Manage Cookies" [ref=e923] [cursor=pointer]
+        - generic [ref=e924]:
+          - button "Change language" [ref=e925] [cursor=pointer]:
+            - generic [ref=e930]:
+              - text: English
+              - generic [ref=e931]: United States
+          - generic:
+            - generic:
+              - generic:
+                - generic:
+                  - generic:
+                    - textbox "Search locales by name or region":
+                      - /placeholder: Search
