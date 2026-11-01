@@ -1,0 +1,70 @@
+# Custom Semgrep rules for loose.ai (Phase 10 §7.7, W4). Run together with the p/javascript,
+# p/typescript, p/expressjs and p/security-audit registry rulesets (see .github/workflows/security.yml).
+# These rules encode conventions specific to this codebase that generic rulesets can't know about.
+rules:
+  - id: loose-raw-fetch-outbound
+    languages: [typescript]
+    severity: WARNING
+    message: >-
+      Outbound HTTP calls to user/org-controlled URLs (webhooks, MCP servers, OIDC discovery,
+      skill imports) must go through `ctx.fetch` / `lib/net/safeFetch.ts`'s `assertPublicUrl`,
+      not the global `fetch`, or they bypass the SSRF guard (private-IP/metadata-endpoint block,
+      redirect pinning, timeout, size cap). See README "LocalSandboxProvider" and
+      phase10-design.md §6.4.
+    patterns:
+      - pattern: fetch(...)
+      - pattern-not: ctx.fetch(...)
+      - pattern-not-inside: 'export async function safeFetch(...) { ... }'
+    paths:
+      include:
+        - apps/server/src/services/*.ts
+        - apps/server/src/services/**/*.ts
+      exclude:
+        - apps/server/src/lib/net/safeFetch.ts
+        - '**/*.test.ts'
+
+  - id: loose-no-console-log
+    languages: [typescript]
+    severity: WARNING
+    message: >-
+      Use `ctx.logger` (pino), not `console.log`/`console.error`, in server source. Direct
+      console output bypasses log redaction and structured-log shipping, and is a common way
+      secrets end up in plaintext CI logs.
+    patterns:
+      - pattern-either:
+          - pattern: console.log(...)
+          - pattern: console.error(...)
+          - pattern: console.warn(...)
+    paths:
+      include:
+        - apps/server/src/**/*.ts
+      exclude:
+        - '**/*.test.ts'
+        - apps/server/src/config/env.ts # boot-time validation prints before the logger exists
+        - apps/server/src/index.ts # same: fatal boot errors before ctx.logger exists
+        - apps/server/src/worker.ts # same
+
+  - id: loose-no-plaintext-secret-column
+    languages: [typescript]
+    severity: ERROR
+    message: >-
+      Fields that hold credentials (API keys, OAuth tokens, MCP headers, webhook secrets) must
+      be stored envelope-encrypted (`EnvelopeCrypto` / `*Enc` columns) or, for bearer tokens that
+      only need to be *verified* later (invites, PATs, SCIM tokens), hashed with `sha256Hex`/
+      `hashToken` — never the raw value. If this finding is a false positive because the value
+      is already wrapped in one of those, add it to this rule's `pattern-not` list rather than
+      suppressing the finding inline.
+    patterns:
+      - pattern-either:
+          - pattern: '$PRISMA.$MODEL.create({ data: { ..., token: $TOK, ... } })'
+          - pattern: '$PRISMA.$MODEL.create({ data: { ..., apiKey: $TOK, ... } })'
+          - pattern: '$PRISMA.$MODEL.create({ data: { ..., accessToken: $TOK, ... } })'
+          - pattern: '$PRISMA.$MODEL.update({ data: { ..., secret: $TOK, ... } })'
+      - pattern-not: '$PRISMA.$MODEL.create({ data: { ..., token: sha256Hex(...), ... } })'
+      - pattern-not: '$PRISMA.$MODEL.create({ data: { ..., token: hashToken(...), ... } })'
+      - pattern-not: '$PRISMA.$MODEL.create({ data: { ..., apiKey: sha256Hex(...), ... } })'
+      - pattern-not: '$PRISMA.$MODEL.create({ data: { ..., apiKey: hashToken(...), ... } })'
+      - pattern-not: '$PRISMA.$MODEL.create({ data: { ..., accessToken: $ENC.encrypt(...), ... } })'
+    paths:
+      exclude:
+        - '**/*.test.ts'
