@@ -1,0 +1,147 @@
+# loose.ai deploy workflow template
+# Manual trigger only (workflow_dispatch). Never auto-deploys.
+# This is a TEMPLATE — fill in registry, cluster, and secret names before use.
+# It does NOT push automatically; the user must set up the required secrets.
+
+name: Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        type: choice
+        options:
+          - staging
+          - production
+      image_tag:
+        description: 'Image tag to deploy (default: sha of HEAD)'
+        required: false
+        type: string
+      run_migrations:
+        description: 'Run database migrations'
+        required: false
+        type: boolean
+        default: true
+
+# Prevent concurrent deploys to the same environment
+concurrency:
+  group: deploy-${{ github.event.inputs.environment }}
+  cancel-in-progress: false
+
+jobs:
+  build-and-push:
+    name: Build and push images
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write # ghcr.io push
+    outputs:
+      tag: ${{ steps.tag.outputs.tag }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Determine image tag
+        id: tag
+        run: |
+          TAG="${{ github.event.inputs.image_tag }}"
+          if [ -z "$TAG" ]; then
+            TAG="${{ github.sha }}"
+          fi
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "Image tag: $TAG"
+
+      - name: Log in to container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push API image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/api.Dockerfile
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/loose-api:${{ steps.tag.outputs.tag }}
+            ghcr.io/${{ github.repository_owner }}/loose-api:latest-${{ github.event.inputs.environment }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and push worker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/worker.Dockerfile
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/loose-worker:${{ steps.tag.outputs.tag }}
+            ghcr.io/${{ github.repository_owner }}/loose-worker:latest-${{ github.event.inputs.environment }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and push web image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/web.Dockerfile
+          push: true
+          build-args: |
+            VITE_API_URL=${{ vars.VITE_API_URL }}
+            VITE_WS_URL=${{ vars.VITE_WS_URL }}
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/loose-web:${{ steps.tag.outputs.tag }}
+            ghcr.io/${{ github.repository_owner }}/loose-web:latest-${{ github.event.inputs.environment }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  migrate:
+    name: Run migrations
+    needs: build-and-push
+    if: github.event.inputs.run_migrations == 'true'
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment }}
+    steps:
+      - name: Run prisma migrate deploy
+        # Replace with your actual deployment command:
+        # - kubectl exec, docker run, Railway CLI, Render deploy hook, etc.
+        run: |
+          echo "TODO: run prisma migrate deploy for ${{ github.event.inputs.environment }}"
+          echo "Image: ghcr.io/${{ github.repository_owner }}/loose-api:${{ needs.build-and-push.outputs.tag }}"
+          # Example with docker:
+          # Migrations run as the table OWNER (MIGRATION_DATABASE_URL), never with the runtime
+          # DATABASE_URL of the API/worker (role loose_app); afterwards refresh the runtime role's
+          # grants with docker/postgres/apply-runtime-role.sh (docs/deployment.md#database-roles).
+          # docker run --rm \
+          #   -e DATABASE_URL="${{ secrets.MIGRATION_DATABASE_URL }}" \
+          #   -e SESSION_SECRET="${{ secrets.SESSION_SECRET }}" \
+          #   -e LOCAL_KMS_MASTER_KEY="${{ secrets.LOCAL_KMS_MASTER_KEY }}" \
+          #   ghcr.io/${{ github.repository_owner }}/loose-api:${{ needs.build-and-push.outputs.tag }} \
+          #   sh -c "bunx prisma migrate deploy --schema apps/server/prisma/schema.prisma"
+
+  deploy:
+    name: Deploy
+    needs: [build-and-push, migrate]
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment }}
+    steps:
+      - name: Deploy to environment
+        # Replace with your actual deployment mechanism
+        run: |
+          echo "TODO: deploy ${{ needs.build-and-push.outputs.tag }} to ${{ github.event.inputs.environment }}"
+          echo "Canary deploy recommended: update one replica first, smoke test, then roll out."
+          # Rollback note: to roll back, re-run this workflow with the previous image tag.
+          # Migrations are additive; no rollback migration is needed for Phase 10.
+
+      - name: Smoke test
+        run: |
+          echo "TODO: run smoke tests against ${{ github.event.inputs.environment }}"
+          # curl -f "${HEALTH_URL}/healthz"
+          # curl -f "${HEALTH_URL}/readyz"
