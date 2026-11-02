@@ -1,0 +1,226 @@
+- generic [ref=f2e2]:
+  - generic [ref=f2e3]:
+    - banner [ref=f2e4]:
+      - link "loose.ai home" [ref=f2e5] [cursor=pointer]:
+        - /url: /
+        - generic [ref=f2e6]:
+          - generic [ref=f2e7]: L
+          - generic [ref=f2e9]: loose.ai
+      - link "Start building" [ref=f2e11] [cursor=pointer]:
+        - /url: /signup
+    - main [ref=f2e14]:
+      - generic [ref=f2e15]:
+        - generic [ref=f2e19]:
+          - generic [ref=f2e20]: The AI workspace where ideas become software
+          - heading "Make software. Not tickets." [level=1] [ref=f2e24]:
+            - generic [ref=f2e25]: Make software.
+            - generic [ref=f2e27]: Not tickets.
+          - paragraph [ref=f2e29]: Turn a conversation into real, reviewable code. loose.ai gives every team member a safe way to build, preview, and ship changes.
+          - generic [ref=f2e30]:
+            - link "Start building for free" [ref=f2e31] [cursor=pointer]:
+              - /url: /signup
+            - link "See how it works" [ref=f2e34] [cursor=pointer]:
+              - /url: "#product"
+          - paragraph [ref=f2e37]: Connect GitHub · Bring your own API key · No credit card required
+        - generic "loose.ai product preview" [ref=f2e39]:
+          - generic [ref=f2e41]:
+            - generic [ref=f2e42]: Preview live
+            - generic [ref=f2e50]:
+              - generic [ref=f2e51]:
+                - generic [ref=f2e53]:
+                  - generic [ref=f2e54]: Agent
+                  - generic [ref=f2e58]: Simple mode
+                - generic [ref=f2e59]:
+                  - generic [ref=f2e60]: Make the hero feel more premium and add a clear call to action.
+                  - generic [ref=f2e61]:
+                    - generic [ref=f2e62]: I’ll refine the typography, spacing, and primary action while keeping your current brand.
+                    - generic [ref=f2e68]:
+                      - generic [ref=f2e69]:
+                        - generic [ref=f2e70]: Agent is working
+                        - generic [ref=f2e72]: 00:18
+                      - generic [ref=f2e73]:
+                        - generic [ref=f2e79]:
+                          - generic [ref=f2e80]: Understanding your codebase
+                          - paragraph [ref=f2e84]: Found 12 relevant files
+                        - generic [ref=f2e94]:
+                          - generic [ref=f2e95]: Implementing the change
+                          - paragraph [ref=f2e99]: Editing Hero.tsx + styles
+                        - generic [ref=f2e107]:
+                          - generic [ref=f2e108]: Validating the result
+                          - paragraph [ref=f2e112]: Tests and responsive checks
+                        - generic [ref=f2e120]:
+                          - generic [ref=f2e121]: Preparing for review
+                          - paragraph [ref=f2e125]: Clean diff · no regressions
+                      - generic [ref=f2e127]: ✓ npm test 24 passed · build clean
+                - generic [ref=f2e129]:
+                  - text: Ask for another change…
+                  - button "Send message" [ref=f2e130]
+              - generic [ref=f2e133]:
+                - generic [ref=f2e134]: localhost:3000
+                - generic [ref=f2e136]:
+                  - generic [ref=f2e137]:
+                    - generic [ref=f2e138]: north°
+                    - generic [ref=f2e139]:
+                      - generic [ref=f2e140]: About
+                      - generic [ref=f2e141]: Work
+                      - generic [ref=f2e142]: Journal
+                    - generic [ref=f2e143]: Let’s talk
+                  - generic [ref=f2e147]:
+                    - paragraph [ref=f2e148]: Independent creative studio
+                    - paragraph [ref=f2e149]: Ideas that move culture forward.
+                    - paragraph [ref=f2e150]: Strategy, identity, and digital experiences for ambitious teams building what comes next.
+                    - generic [ref=f2e151]: Start a project
+                - generic [ref=f2e154]: Hero heading
+            - generic [ref=f2e157]:
+              - generic [ref=f2e158]: 3 files changed
+              - generic [ref=f2e163]: Ready to review
+      - generic [ref=f2e169]:
+        - paragraph [ref=f2e170]: One workspace for everyone who shapes the product
+        - generic [ref=f2e171]:
+          - generic [ref=f2e172]: Product
+          - generic [ref=f2e177]: Engineering
+          - generic [ref=f2e182]: Design
+          - generic [ref=f2e186]: Growth
+          - generic [ref=f2e189]: Operations
+      - generic [ref=f2e193]:
+        - generic [ref=f2e194]:
+          - generic [ref=f2e195]:
+            - paragraph [ref=f2e196]: From thought to shipped
+            - heading "Your best ideas no longer wait in the backlog." [level=2] [ref=f2e197]
+          - paragraph [ref=f2e198]: A complete environment for making meaningful changes—without lowering the bar for quality.
+        - generic [ref=f2e199]:
+          - article [ref=f2e200]:
+            - generic [ref=f2e201]: "01"
+            - generic [ref=f2e206]:
+              - heading "Build in plain English" [level=3] [ref=f2e207]
+              - paragraph [ref=f2e208]: Describe what you want, not how to code it. loose.ai understands your repository, makes the change, and explains what happened.
+          - article [ref=f2e209]:
+            - generic [ref=f2e210]: "02"
+            - generic [ref=f2e218]:
+              - heading "See every change live" [level=3] [ref=f2e219]
+              - paragraph [ref=f2e220]: Watch your app update in a secure preview as the agent works. Click any element to point the conversation exactly where it needs to go.
+          - article [ref=f2e221]:
+            - generic [ref=f2e222]: "03"
+            - generic [ref=f2e229]:
+              - heading "Ship with confidence" [level=3] [ref=f2e230]
+              - paragraph [ref=f2e231]: Review the diff, rewind to a checkpoint, or open a focused pull request. You stay in control from first prompt to production-ready code.
+      - generic [ref=f2e233]:
+        - generic [ref=f2e234]:
+          - paragraph [ref=f2e235]: A complete agent workspace
+          - heading "More than a chat box. Everything the work needs." [level=2] [ref=f2e236]: More than a chat box.Everything the work needs.
+          - paragraph [ref=f2e237]: loose.ai surrounds the coding agent with the context, tools, guardrails, and delivery workflow required for real repositories—not toy demos.
+        - generic [ref=f2e238]:
+          - article [ref=f2e239]:
+            - generic [ref=f2e240]: "01"
+            - heading "Live preview" [level=3] [ref=f2e246]
+            - paragraph [ref=f2e247]: See every change in a real browser before it reaches a branch.
+          - article [ref=f2e248]:
+            - generic [ref=f2e249]: "02"
+            - heading "Safe checkpoints" [level=3] [ref=f2e255]
+            - paragraph [ref=f2e256]: Rewind code, conversation, or both at any point.
+          - article [ref=f2e257]:
+            - generic [ref=f2e258]: "03"
+            - heading "Plans and subagents" [level=3] [ref=f2e265]
+            - paragraph [ref=f2e266]: Approve the approach first, then let specialized agents execute in parallel.
+          - article [ref=f2e267]:
+            - generic [ref=f2e268]: "04"
+            - heading "Your tools, connected" [level=3] [ref=f2e273]
+            - paragraph [ref=f2e274]: Extend the agent with MCP servers, skills, hooks, and team commands.
+          - article [ref=f2e275]:
+            - generic [ref=f2e276]: "05"
+            - heading "Built for collaboration" [level=3] [ref=f2e284]
+            - paragraph [ref=f2e285]: Share sessions, hand over control, and keep everyone in the loop.
+          - article [ref=f2e286]:
+            - generic [ref=f2e287]: "06"
+            - heading "Model freedom" [level=3] [ref=f2e293]
+            - paragraph [ref=f2e294]: Bring your own model API key and stay in control of cost and capability.
+        - generic [ref=f2e296]:
+          - generic [ref=f2e297]:
+            - generic [ref=f2e298]: Simple mode
+            - heading "For everyone with an idea." [level=3] [ref=f2e303]
+            - paragraph [ref=f2e304]: Plain-English conversations, visual element selection, safe quick actions, and a live preview—without exposing code or terminal complexity.
+            - list [ref=f2e305]:
+              - listitem [ref=f2e306]: Click an element and describe the change
+              - listitem [ref=f2e309]: Follow a clear, jargon-free progress story
+              - listitem [ref=f2e312]: Review the result visually before delivery
+          - generic [ref=f2e315]:
+            - generic [ref=f2e316]: Pro mode
+            - heading "For developers who want the details." [level=3] [ref=f2e320]
+            - paragraph [ref=f2e321]: Inspect diffs, files, tool calls, plans, terminal output, context usage, and checkpoints while the agent works.
+            - list [ref=f2e322]:
+              - listitem [ref=f2e323]: Approve plans and sensitive tool calls
+              - listitem [ref=f2e326]: Inspect every diff, command, and timeline event
+              - listitem [ref=f2e329]: Rewind, fork, commit, or open a pull request
+      - generic [ref=f2e333]:
+        - generic [ref=f2e334]:
+          - paragraph [ref=f2e335]: One simple loop
+          - heading "Describe it. Watch it happen. Ship it." [level=2] [ref=f2e336]
+          - paragraph [ref=f2e337]: No environment setup. No copy-pasting between tools. Just a direct path from intent to working software.
+        - generic [ref=f2e338]:
+          - generic [ref=f2e340]:
+            - generic [ref=f2e341]: "01"
+            - heading "Describe" [level=3] [ref=f2e346]
+            - paragraph [ref=f2e347]: Ask for a feature, fix, or redesign.
+          - generic [ref=f2e349]:
+            - generic [ref=f2e350]: "02"
+            - heading "Watch" [level=3] [ref=f2e356]
+            - paragraph [ref=f2e357]: See the agent work and preview it live.
+          - generic [ref=f2e359]:
+            - generic [ref=f2e360]: "03"
+            - heading "Deliver" [level=3] [ref=f2e367]
+            - paragraph [ref=f2e368]: Review the change and open a clean PR.
+        - generic [ref=f2e369]:
+          - generic [ref=f2e370]: Real terminal
+          - generic [ref=f2e373]: Reviewable diffs
+          - generic [ref=f2e378]: Automatic checkpoints
+          - generic [ref=f2e383]: Native GitHub delivery
+      - generic [ref=f2e388]:
+        - generic [ref=f2e389]:
+          - paragraph [ref=f2e394]: Built for responsible AI
+          - heading "Fast doesn’t have to mean reckless." [level=2] [ref=f2e395]
+          - paragraph [ref=f2e396]: loose.ai pairs agent autonomy with strong isolation, clear visibility, and human control at every important boundary.
+          - link "Explore our platform standards" [ref=f2e397] [cursor=pointer]:
+            - /url: /docs/errors
+        - generic [ref=f2e400]:
+          - generic [ref=f2e405]:
+            - heading "Isolated workspaces" [level=3] [ref=f2e406]
+            - paragraph [ref=f2e407]: Every session runs away from your infrastructure in its own sandbox.
+          - generic [ref=f2e412]:
+            - heading "Bring your own model key" [level=3] [ref=f2e413]
+            - paragraph [ref=f2e414]: Your credentials are encrypted and your usage stays in your control.
+          - generic [ref=f2e419]:
+            - heading "Human approval built in" [level=3] [ref=f2e420]
+            - paragraph [ref=f2e421]: Sensitive commands and delivery actions wait for your explicit approval.
+          - generic [ref=f2e426]:
+            - heading "Enterprise-ready controls" [level=3] [ref=f2e427]
+            - paragraph [ref=f2e428]: SSO, SCIM, audit trails, policy packs, and fine-grained access controls.
+      - generic [ref=f2e434]:
+        - heading "The next change starts with a sentence." [level=2] [ref=f2e440]
+        - paragraph [ref=f2e441]: Bring your repository and your next idea. loose.ai will help you take it from “what if?” to ready for review.
+        - link "Start building for free" [ref=f2e442] [cursor=pointer]:
+          - /url: /signup
+    - contentinfo [ref=f2e445]:
+      - generic [ref=f2e446]:
+        - generic [ref=f2e447]:
+          - generic [ref=f2e448]:
+            - generic [ref=f2e449]:
+              - generic [ref=f2e450]: L
+              - generic [ref=f2e452]: loose.ai
+            - paragraph [ref=f2e453]: A safer, clearer way for every team to make software together.
+          - generic [ref=f2e454]:
+            - generic [ref=f2e455]:
+              - paragraph [ref=f2e456]: Product
+              - link "Overview" [ref=f2e457] [cursor=pointer]:
+                - /url: "#product"
+              - link "Security" [ref=f2e458] [cursor=pointer]:
+                - /url: "#security"
+            - generic [ref=f2e459]:
+              - paragraph [ref=f2e460]: Get started
+              - link "Create account" [ref=f2e461] [cursor=pointer]:
+                - /url: /signup
+              - link "Sign in" [ref=f2e462] [cursor=pointer]:
+                - /url: /signin
+        - generic [ref=f2e463]:
+          - paragraph [ref=f2e464]: © 2026 loose.ai. Built for people who build.
+          - paragraph [ref=f2e465]: Private by design. Human in control.
+  - region "Notifications alt+T"
