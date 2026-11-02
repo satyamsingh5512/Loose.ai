@@ -1,0 +1,128 @@
+name: Security
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    # Weekly, catches newly-disclosed CVEs in pinned deps even without a code change.
+    - cron: '0 6 * * 1'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: security-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  codeql:
+    name: CodeQL (JavaScript/TypeScript)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript-typescript
+          queries: security-and-quality
+
+      - name: Perform CodeQL analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: '/language:javascript-typescript'
+
+  semgrep:
+    name: Semgrep
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      security-events: write
+    container:
+      image: semgrep/semgrep:1.96.0
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Semgrep
+        run: |
+          semgrep scan \
+            --config .semgrep.yml \
+            --config p/javascript \
+            --config p/typescript \
+            --config p/expressjs \
+            --config p/security-audit \
+            --sarif --output semgrep.sarif \
+            --error
+        continue-on-error: true
+        id: semgrep
+
+      - name: Upload SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: semgrep.sarif
+
+      - name: Fail if Semgrep found blocking findings
+        if: steps.semgrep.outcome == 'failure'
+        run: exit 1
+
+  gitleaks:
+    name: gitleaks (secret scanning)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITLEAKS_CONFIG: .gitleaks.toml
+
+  dependency-audit:
+    name: bun audit + SBOM
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.2
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      # Blocking: README's "Dependency overrides" table tracks the only two accepted
+      # transitive-dev-tool exceptions; any other finding fails the build.
+      - name: bun audit
+        run: bun audit
+
+      # SBOM for the dependency tree actually installed (CycloneDX JSON), uploaded as an
+      # artifact for the security review / release process — not published anywhere.
+      - name: Generate SBOM
+        run: |
+          bunx --bun @cyclonedx/cyclonedx-npm@1.19.3 \
+            --output-format json \
+            --output-file sbom.json \
+            --package-lock-only || bun pm ls --all > sbom-fallback.txt
+
+      - name: Upload SBOM
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom
+          path: |
+            sbom.json
+            sbom-fallback.txt
+          if-no-files-found: ignore
+          retention-days: 90
