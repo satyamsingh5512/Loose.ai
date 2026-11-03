@@ -1,0 +1,9 @@
+dist
+node_modules
+bun.lock
+*.md
+apps/server/prisma/migrations
+coverage
+.turbo
+# Inline <script>/<style> are pinned by sha256 in docker/nginx.conf (CSP); reformatting breaks the hashes.
+status/index.html
